@@ -2,14 +2,14 @@
 from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
 from models.users import UserInfo
-from models.router_response import Message
+from constant import Message, Constant
 # from constant import Constant
 from pymongo import MongoClient
 import bcrypt
 
 
 router = APIRouter(prefix="/api/v1", tags=["User Register"])
-client = MongoClient(host="mongodb+srv://phuchauxd12:Abcd0123@cluster0.lf8sh9p.mongodb.net/").get_database("dev")
+client = MongoClient(host= Constant.MONGODB_URI ).get_database("dev")
 db = client.get_collection("USERS")
 
 
