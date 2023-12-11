@@ -8,7 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routers import register, account
 
-
 app = FastAPI(
     openapi_url="/api/v1/openapi.json",
     docs_url="/api/v1/docs",
