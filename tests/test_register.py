@@ -2,12 +2,12 @@
 
 from pymongo import MongoClient
 import bcrypt
-from app.constant import Constant
+# from app.constant import Constant
 
 
 
 def test_create_user():
-    client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+    client = MongoClient(host='mongodb+srv://phuchauxd12:Abcd0123@cluster0.lf8sh9p.mongodb.net/').get_database("dev")
     db = client.get_collection("USERS")
     user_name = "tuanxautrai"
     password = "123"
@@ -25,7 +25,7 @@ def test_create_user():
     assert stored_data["address"] == address
 
 def test_user_aldready_exists():
-    client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+    client = MongoClient(host='mongodb+srv://phuchauxd12:Abcd0123@cluster0.lf8sh9p.mongodb.net/').get_database("dev")
     db = client.get_collection("USERS")
     user_name = "tuanxautrai"
     password = "123"
@@ -37,7 +37,7 @@ def test_user_aldready_exists():
     assert len(list(stored_data)) == 1
 
 def test_wrong_data_type():
-    client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+    client = MongoClient(host='mongodb+srv://phuchauxd12:Abcd0123@cluster0.lf8sh9p.mongodb.net/').get_database("dev")
     db = client.get_collection("USERS")
     user_name = "tuanwibu"
     password = "123"
@@ -50,7 +50,7 @@ def test_wrong_data_type():
 
 
 def test_missing_data():
-    client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+    client = MongoClient(host='mongodb+srv://phuchauxd12:Abcd0123@cluster0.lf8sh9p.mongodb.net/').get_database("dev")
     db = client.get_collection("USERS")
     user_name = "tuanwibu"
     password = "123"
