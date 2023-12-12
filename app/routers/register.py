@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Form, BackgroundTasks
+from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
 from models.users import UserInfo
 from constant import Message, Constant
 # from constant import Constant
 from pymongo import MongoClient
 import bcrypt
-from models.email import EmailSchema, send_email         
+
+
 router = APIRouter(prefix="/api/v1", tags=["User Register"])
 client = MongoClient(host= Constant.MONGODB_URI ).get_database("dev")
 db = client.get_collection("USERS")
@@ -14,13 +15,13 @@ db = client.get_collection("USERS")
 
 @router.post("/register", responses= {409: {"model": Message},
                                       422: {"model": Message}})
-def register_user(  background_tasks: BackgroundTasks, # this for email send
+def register_user(
     user_name: str = Form(..., description="Username of the user"),
     password: str = Form(..., description="Password of the user"),
     full_name: str = Form(..., description="Full name of the user"),
     number: str = Form(None, description="Phone number of the user"),
     email: str = Form(..., description="Email address of the user"),
-    address: str = Form(None, description="Address of the user"),
+    address: str = Form(None, description="Address of the user")
 ):
     password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     if db.find_one({'username': user_name}):
@@ -30,12 +31,6 @@ def register_user(  background_tasks: BackgroundTasks, # this for email send
     try: 
         db.insert_one(
             UserInfo(username=user_name, full_name=full_name, password=password, number=number, email= email, address= address).dict())
-
-        subject = "key for account login in Budget Buddy application"
-        body = "KEY: "+ str(db.find_one({'username': user_name})['key'])
-        data = EmailSchema(to=email, subject=subject, body=body).dict()
-        background_tasks.add_task(send_email, data["to"], data["subject"], data["body"])
-
     except ValueError as e:
         # Handle Pydantic validation errors
         return JSONResponse(status_code=422, content={"message": str(e)}) # error for email and number
