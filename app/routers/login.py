@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import JSONResponse
-from models.users import UserInfo
 from constant import Message, Constant
 from pymongo import MongoClient
 import bcrypt
@@ -15,24 +14,20 @@ def login(user_name: str = Form(..., description="Username of the user"),
           key: str = Form(..., description='Key for validation')
           ):
 
-    # Hash the input password
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    
     # Find the user account in the database
     account = db.find_one({'username': user_name})
     
     if account:
-        # Compare the hashed input password with the stored hashed password
+        # Compare the entered password with the stored hashed password
         if bcrypt.checkpw(password.encode('utf-8'), account['password'].encode('utf-8')):
             if key == account['key']:
-                return JSONResponse(content={"user_name": user_name, "password": hashed_password.decode('utf-8')})
+                return JSONResponse(content={"user_name": user_name})
             else:
                 return JSONResponse(status_code=401, content={'message': "Password is incorrect."})
         else:
             return JSONResponse(status_code=401, content={'message': "Password is incorrect."})
     else:
         return JSONResponse(status_code=404, content={'message': "User does not exist."})
-    
 
 
  
