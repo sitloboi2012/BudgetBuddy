@@ -8,6 +8,7 @@ from typing_extensions import Annotated
 from pymongo import ReturnDocument
 from bson import ObjectId
 import uuid
+from typing import Optional
 
 class UserInfo(BaseModel):
     """
@@ -17,9 +18,9 @@ class UserInfo(BaseModel):
     username: str = Field(..., description="Username of the user")
     full_name: str = Field(..., description="Full name of the user")
     password: str = Field(..., description="Password of the user")
-    number: str = Field(None, description="Phone number of the user")
+    number: Optional[str] = Field(None, description="Phone number of the user")
     email: EmailStr = Field(..., description="Email address of the user")
-    address: str = Field(None, description="Address of the user") #optional
+    address: Optional[str] = Field(None, description="Address of the user")  # optional
     created_at: datetime = Field(default_factory=datetime.now, description="Creation timestamp of the user")
     key: str =Field(default_factory=lambda: uuid.uuid1().hex, description= "Key for login")
     @validator("number")
