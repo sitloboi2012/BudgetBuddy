@@ -28,7 +28,3 @@ def login(user_name: str = Form(..., description="Username of the user"),
             return JSONResponse(status_code=401, content={'message': "Password is incorrect."})
     else:
         return JSONResponse(status_code=404, content={'message': "User does not exist."})
-
-
- 
- 
