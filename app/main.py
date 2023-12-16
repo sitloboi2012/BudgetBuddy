@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import register, newsletter, bank_account, banking_data
+from routers import register, newsletter, bank_account, bank_info
 
 app = FastAPI(
     openapi_url="/api/v1/openapi.json",
@@ -23,7 +23,7 @@ app.add_middleware(
 app.include_router(register.router)
 app.include_router(newsletter.router)
 app.include_router(bank_account.router)
-app.include_router(banking_data.router)
+app.include_router(bank_info.router)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", workers=1, host="0.0.0.0", port=8080, reload= True)
+    uvicorn.run("main:app", workers=1, host="0.0.0.0", port=8080)

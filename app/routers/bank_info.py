@@ -8,7 +8,7 @@ from models.bank_info import BankInfo, ListOfBankInfo
 
 router = APIRouter(prefix="/api/v1", tags=["Banking Data Info"])
 client = MongoClient(host= Constant.MONGODB_URI ).get_database("dev")
-bank_info = client.get_collection("BANKING_DATA")
+bank_info = client.get_collection("BANK_INFO")
 
 @router.get("/get_bank_data")
 def get_bank_data():
