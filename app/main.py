@@ -6,7 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import register, login, profile
+from routers import register, newsletter, profile, login
 
 app = FastAPI(
     openapi_url="/api/v1/openapi.json",
@@ -19,7 +19,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(register.router)
+app.include_router(newsletter.router)
 app.include_router(login.router)
 app.include_router(profile.router)
 if __name__ == "__main__":

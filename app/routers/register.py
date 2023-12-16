@@ -44,4 +44,3 @@ def register_user(  background_tasks: BackgroundTasks, # this for email send
     assert len(list(db.find({'username': user_name}))) == 1    # test case
 
     return JSONResponse(content={"user_name": user_name, "password": password.decode('utf-8'), "full_name": full_name, "number": number, "email": email, "address": address, 'key':db.find_one({'username': user_name})['key']})
-
