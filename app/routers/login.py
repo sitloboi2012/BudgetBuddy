@@ -23,7 +23,7 @@ def login(user_name: str = Form(..., description="Username of the user"),
             if key == account['key']:
                 return JSONResponse(content={"user_name": user_name})
             else:
-                return JSONResponse(status_code=401, content={'message': "Password is incorrect."})
+                return JSONResponse(status_code=401, content={'message': "Key is incorrect."})
         else:
             return JSONResponse(status_code=401, content={'message': "Password is incorrect."})
     else:
