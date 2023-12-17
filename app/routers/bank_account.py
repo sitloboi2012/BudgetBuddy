@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 
 from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
@@ -9,24 +10,25 @@ from models.bank_account import (
     ExpenseAccount,
     AccountGeneric,
     BaseAccount,
+    GetAccountInformation
 )
 from bson import ObjectId
 
 router = APIRouter(prefix="/api/v1", tags=["CRUD Bank Account"])
 
 # MONGODB CONNECTION
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-bank_collection = client.get_collection("BANK_INFO")
-account_collection = client.get_collection("ACCOUNTS")
-saving_collection = client.get_collection("SAVING_ACCOUNTS")
-investment_collection = client.get_collection("INVESTMENT_ACCOUNTS")
-expense_collection = client.get_collection("EXPENSE_ACCOUNTS")
+CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+BANK_COLLECTION = CLIENT.get_collection("BANK_INFO")
+ACCOUNT_COLLECTION = CLIENT.get_collection("ACCOUNTS")
+SAVING_COLLECTION = CLIENT.get_collection("SAVING_ACCOUNTS")
+INVESTMENT_COLLECTION = CLIENT.get_collection("INVESTMENT_ACCOUNTS")
+EXPENSE_COLLECTION = CLIENT.get_collection("EXPENSE_ACCOUNTS")
 
 # MODEL INITIALIZATION
-model = {
-    "Saving": [SavingOrInvestmentAccount, saving_collection],
-    "Investment": [SavingOrInvestmentAccount, investment_collection],
-    "Expense": [ExpenseAccount, expense_collection],
+MODEL = {
+    "Saving": [SavingOrInvestmentAccount, SAVING_COLLECTION],
+    "Investment": [SavingOrInvestmentAccount, INVESTMENT_COLLECTION],
+    "Expense": [ExpenseAccount, EXPENSE_COLLECTION],
 }
 
 
@@ -36,7 +38,7 @@ def create_new_account_generic(user_id: str, bank_id: str, number_of_account: in
         bank_id=ObjectId(bank_id),
         number_of_account=number_of_account,
     ).dict()
-    account_collection.insert_one(account_generic)
+    ACCOUNT_COLLECTION.insert_one(account_generic)
     return account_generic["_id"]
 
 
@@ -60,7 +62,7 @@ def verify_account_info(
             ).dict()
         )
         query = {"bank_id": bank_id, "user_id": user_id}
-        account_collection.update_one(query, {"$inc": {"number_of_account": 1}})
+        ACCOUNT_COLLECTION.update_one(query, {"$inc": {"number_of_account": 1}})
         return True
     else:
         return False
@@ -78,19 +80,19 @@ def create_account_manually(
     bank_name: str = Form(..., description="Bank name of the bank account"),
 ) -> JSONResponse:
     # Check if account type is valid. Must be either Saving, Investment, or Expense
-    if account_type not in model:
+    if account_type not in MODEL:
         return JSONResponse(
             status_code=422, content={"message": "Invalid account type"}
         )
 
     # Check if bank name is available in the database
-    bank = bank_collection.find_one({"bank_name": bank_name})
+    bank = BANK_COLLECTION.find_one({"bank_name": bank_name})
     if bank is None:
         return JSONResponse(status_code=422, content={"message": "Invalid bank name"})
 
     bank_id = bank["_id"]
 
-    account = account_collection.find_one(
+    account = ACCOUNT_COLLECTION.find_one(
         {"bank_id": ObjectId(bank_id), "user_id": ObjectId(user_id)}
     )
     if account is None:
@@ -100,7 +102,7 @@ def create_account_manually(
 
     created_account = verify_account_info(
         account_name=account_name,
-        account_type_model=model[account_type],
+        account_type_model=MODEL[account_type],
         account_id=ObjectId(account_id),
         user_id=ObjectId(user_id),
         bank_id=ObjectId(bank_id),
@@ -115,3 +117,56 @@ def create_account_manually(
         return JSONResponse(
             status_code=422, content={"message": "Bank account already exists"}
         )
+
+
+@router.get("/{user_id}/{account_type}/{account_name}")
+def get_bank_account_info(
+    user_id: str,
+    account_type: str,
+    account_name: str,
+):
+    account_type_model = MODEL[account_type]
+    account_data = account_type_model[1].find_one({"account_name": account_name, "user_id": ObjectId(user_id)})
+    
+    bank_id = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
+    
+    return JSONResponse(
+        status_code=200,
+        content={
+            "account_name": account_data["account_name"],
+            "bank_name": bank_id,
+            "current_balance": account_data["current_balance"]
+        }
+    )
+
+@router.put("/{user_id}/{account_type}/{account_name}")
+def update_account_info(
+    user_id: str,
+    account_type: str,
+    account_name: str,
+    new_value: dict[str, str]
+):
+    account_type_model = MODEL[account_type]
+    print(new_value)
+    
+    current_value = account_type_model[1].find_one({"account_name": account_name, "user_id": ObjectId(user_id)})
+    
+    if "account_name" in new_value:
+        account_type_model[1].update_one(
+            {"account_name": account_name, "user_id": ObjectId(user_id)},
+            {"$set": {"account_name": new_value["account_name"]}}
+        )
+    
+    if "account_type" in new_value:
+        new_account_type_model = MODEL[new_value["account_type"]]
+        new_account_type_model[1].insert_one(
+            new_account_type_model[0](
+                account_name=current_value["account_name"],
+                account_id=current_value["account_id"],
+                user_id=current_value["user_id"],
+                bank_id=current_value["bank_id"],
+                current_balance=current_value["current_balance"],
+            ).dict()
+        )
+        
+        account_type_model[1].delete_one({"account_name": account_name, "user_id": ObjectId(user_id)})
