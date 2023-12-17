@@ -59,7 +59,7 @@ def update( background_tasks: BackgroundTasks,
                     address = account["address"]
                 str_password = NewPassword.decode('utf-8')
                 # Store the hashed password in the database
-                db.find_one_and_update(
+                newAccount = db.find_one_and_update(
                     {"_id": ObjectId(id)},
                     {"$set": {"password": str_password,
                             "key": NewKey,
@@ -69,15 +69,15 @@ def update( background_tasks: BackgroundTasks,
                 )
 
                 # Convert ObjectId to string before returning the JSON response
-                account["_id"] = str(account["_id"])
+                newAccount["_id"] = str(account["_id"])
 
                 # Email send to the customer about the key for login
                 subject = "key for account login in Budget Buddy application"
                 body = "KEY: " + str(NewKey)
-                data = EmailSchema(to=account["email"], subject=subject, body=body).dict()
+                data = EmailSchema(to=newAccount["email"], subject=subject, body=body).dict()
                 background_tasks.add_task(send_email, data["to"], data["subject"], data["body"])
 
-                return JSONResponse(content=jsonable_encoder(account))
+                return JSONResponse(content=jsonable_encoder(newAccount))
             except ValueError as e:
                 return JSONResponse(status_code=422, content={"message": str(e)})
         else:

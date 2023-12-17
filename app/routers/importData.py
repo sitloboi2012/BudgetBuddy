@@ -29,7 +29,7 @@ if import_as == 'IT':
     data1 = transac.to_dict(orient='records')
     print(transaction.insert_many(data1))
 else:
-    bankinfo = client.get_collection("BankInfo")
+    bankinfo = client.get_collection("AccountInfo")
     headers2 = ['Account','Account Type','Current Balance','Saving Time','Interest Rate']
     account_path = os.path.join(current_directory, 'SampleBankAccount-BudgetBuddy-BankInformation.csv')
     account = pd.read_csv(account_path, names=headers2)

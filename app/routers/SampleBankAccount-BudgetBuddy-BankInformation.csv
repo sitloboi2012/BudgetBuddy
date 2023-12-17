@@ -1,4 +1,5 @@
-Transaction Name,Transaction Date,Amount,Description,Account Name,Original Balance,Remain Balance
-Transfer money to Huy Vo,20/11/2023,10.000.000,None,NAPAS Card,30.000.000,20.000.000
-Transfer money to Highlands,21/10/2023,5.000.000,None,VISA Credit Card,85.500.000,80.500.000
-Monthly Pay Back Usage,11/9/2023,500.000,Monthly Usage PayBack VISA,VISA Credit Card,85.000.000,85.500.000
+Account,Account Type,Current Balance,Saving Time,Interest Rate 
+01,Super Saving Account,15.000.000 VND,2 year,6.5%/year
+02,VISA Credit Card,80.500.000 VND,'',''
+03,NAPAS Card,20.000.000 VND,'',''
+04,Sacombank E-Card,20.000.000 VND,'',''
