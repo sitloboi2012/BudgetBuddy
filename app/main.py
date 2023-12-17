@@ -6,8 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import register, newsletter, profile, login
-from routers import register, account
+from routers import register, newsletter, profile, login, account, importData
 
 app = FastAPI(
     openapi_url="/api/v1/openapi.json",
@@ -26,6 +25,6 @@ app.include_router(newsletter.router)
 app.include_router(login.router)
 app.include_router(profile.router)
 app.include_router(account.router)
-
+app.include_router(importData.router)
 if __name__ == "__main__":
     uvicorn.run("main:app", workers=1, host="0.0.0.0", port=8080, reload=True)

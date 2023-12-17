@@ -8,3 +8,4 @@ pytest==7.4.3
 email-validator==2.1.0
 bcrypt==4.1.1
 yfinance==0.2.33
+pandas==2.1.4
