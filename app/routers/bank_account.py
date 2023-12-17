@@ -165,6 +165,10 @@ def delete_account(
 ):
     account_type_model = MODEL[account_type]
     account_type_model[1].delete_one({"account_name": account_name, "user_id": ObjectId(user_id)})
+    ACCOUNT_COLLECTION.update_one(
+        {"user_id": ObjectId(user_id)},
+        {"$inc": {"number_of_account": -1}}
+    )
     return JSONResponse(
         status_code=200, content={"message": "Bank account deleted successfully"}
 )

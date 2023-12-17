@@ -33,7 +33,13 @@ class SavingOrInvestmentAccount(BaseAccount):
 class ExpenseAccount(BaseAccount):
     tag_id: str = Field(None, description="Tag id of the bank account")
     
-class GetAccountInformation(BaseAccount):
+class GetAccountInformation(BaseModel):
     account_name: str = Field(..., description="Account name of the bank account")
     bank_name: str = Field(..., description="Bank name of the bank account")
     current_balance: float = Field(..., description="Current balance of the bank account")
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed=True
+        json_encoders = {
+            ObjectId: str
+        }
