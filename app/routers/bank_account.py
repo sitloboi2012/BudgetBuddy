@@ -8,6 +8,7 @@ from models.bank_account import (
     SavingOrInvestmentAccount,
     ExpenseAccount,
     AccountGeneric,
+    BaseAccount,
 )
 from bson import ObjectId
 
@@ -29,12 +30,40 @@ model = {
 }
 
 
-def create_new_account_generic(user_id: str, bank_id: str, number_of_account: int = 1):
+def create_new_account_generic(user_id: str, bank_id: str, number_of_account: int = 0):
     account_generic = AccountGeneric(
-        user_id=ObjectId(user_id), bank_id=ObjectId(bank_id), number_of_account=number_of_account
+        user_id=ObjectId(user_id),
+        bank_id=ObjectId(bank_id),
+        number_of_account=number_of_account,
     ).dict()
     account_collection.insert_one(account_generic)
     return account_generic["_id"]
+
+
+def verify_account_info(
+    account_name: str,
+    account_type_model: list[BaseAccount, MongoClient],
+    account_id: ObjectId,
+    user_id: ObjectId,
+    bank_id: ObjectId,
+    current_balance: float,
+) -> bool:
+    if account_type_model[1].find_one({"account_name": account_name, "bank_id": bank_id}) is None:
+        account_type_model[1].insert_one(
+            account_type_model[0](
+                account_name=account_name,
+                account_id=account_id,
+                user_id=user_id,
+                bank_id=bank_id,
+                goal_id=None,
+                current_balance=current_balance,
+            ).dict()
+        )
+        query = {"bank_id": bank_id, "user_id": user_id}
+        account_collection.update_one(query, {"$inc": {"number_of_account": 1}})
+        return True
+    else:
+        return False
 
 
 # create account manually
@@ -48,46 +77,41 @@ def create_account_manually(
     ),
     bank_name: str = Form(..., description="Bank name of the bank account"),
 ) -> JSONResponse:
+    # Check if account type is valid. Must be either Saving, Investment, or Expense
     if account_type not in model:
         return JSONResponse(
             status_code=422, content={"message": "Invalid account type"}
         )
 
-    if bank_collection.find_one({"bank_name": bank_name}) is None:
+    # Check if bank name is available in the database
+    bank = bank_collection.find_one({"bank_name": bank_name})
+    if bank is None:
         return JSONResponse(status_code=422, content={"message": "Invalid bank name"})
 
-    if (
-        account_collection.find_one({"account_name": account_name, "user_id": user_id})
-        is not None
-    ):
-        return JSONResponse(
-            status_code=409, content={"message": "Account name already exists"}
-        )
+    bank_id = bank["_id"]
 
-    account_model = model[account_type][0]
-    bank_id = bank_collection.find_one({"bank_name": bank_name})["_id"]
-
-    if (account_collection.find_one({"bank_id": bank_id, "user_id": user_id})) is None:
+    account = account_collection.find_one(
+        {"bank_id": ObjectId(bank_id), "user_id": ObjectId(user_id)}
+    )
+    if account is None:
         account_id = create_new_account_generic(user_id=user_id, bank_id=bank_id)
     else:
-        query = {"bank_id": account_name, "user_id": user_id}
-        account_collection.update_one(query, {"$inc": {"number_of_account": 1}})
-        account_id = account_collection.find_one(
-            {"bank_id": account_name, "user_id": user_id}
-        )["_id"]
+        account_id = account["_id"]
 
-
-    model[account_type][1].insert_one(
-        account_model(
-            account_name=account_name,
-            account_id=ObjectId(account_id),
-            user_id=ObjectId(user_id),
-            bank_id=ObjectId(bank_id),
-            goal_id=None,
-            current_balance=current_balance,
-        ).dict()
+    created_account = verify_account_info(
+        account_name=account_name,
+        account_type_model=model[account_type],
+        account_id=ObjectId(account_id),
+        user_id=ObjectId(user_id),
+        bank_id=ObjectId(bank_id),
+        current_balance=current_balance,
     )
 
-    return JSONResponse(
-        status_code=200, content={"message": "Bank account created successfully"}
-    )
+    if created_account:
+        return JSONResponse(
+            status_code=200, content={"message": "Bank account created successfully"}
+        )
+    else:
+        return JSONResponse(
+            status_code=422, content={"message": "Bank account already exists"}
+        )
