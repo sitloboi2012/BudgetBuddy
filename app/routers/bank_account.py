@@ -3,7 +3,7 @@ import json
 
 from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
-from constant import Constant
+from constant import Constant, Message
 from pymongo import MongoClient
 from models.bank_account import (
     SavingOrInvestmentAccount,
@@ -119,7 +119,7 @@ def create_account_manually(
         )
 
 
-@router.get("/{user_id}/{account_type}/{account_name}")
+@router.get("/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation)
 def get_bank_account_info(
     user_id: str,
     account_type: str,
@@ -130,14 +130,12 @@ def get_bank_account_info(
     
     bank_id = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
     
-    return JSONResponse(
-        status_code=200,
-        content={
-            "account_name": account_data["account_name"],
-            "bank_name": bank_id,
-            "current_balance": account_data["current_balance"]
-        }
-    )
+    return GetAccountInformation(
+        account_name=account_data["account_name"],
+        account_type=account_type,
+        bank_name=bank_id,
+        current_balance=account_data["current_balance"],
+    )   
 
 @router.put("/{user_id}/{account_type}/{account_name}")
 def update_account_info(
@@ -149,24 +147,24 @@ def update_account_info(
     account_type_model = MODEL[account_type]
     print(new_value)
     
-    current_value = account_type_model[1].find_one({"account_name": account_name, "user_id": ObjectId(user_id)})
-    
     if "account_name" in new_value:
         account_type_model[1].update_one(
             {"account_name": account_name, "user_id": ObjectId(user_id)},
             {"$set": {"account_name": new_value["account_name"]}}
         )
-    
-    if "account_type" in new_value:
-        new_account_type_model = MODEL[new_value["account_type"]]
-        new_account_type_model[1].insert_one(
-            new_account_type_model[0](
-                account_name=current_value["account_name"],
-                account_id=current_value["account_id"],
-                user_id=current_value["user_id"],
-                bank_id=current_value["bank_id"],
-                current_balance=current_value["current_balance"],
-            ).dict()
-        )
-        
-        account_type_model[1].delete_one({"account_name": account_name, "user_id": ObjectId(user_id)})
+
+    return JSONResponse(
+        status_code=200, content={"message": "Bank account updated successfully"}
+    )
+
+@router.delete("/{user_id}/{account_type}/{account_name}")
+def delete_account(
+    user_id: str,
+    account_type: str,
+    account_name: str,
+):
+    account_type_model = MODEL[account_type]
+    account_type_model[1].delete_one({"account_name": account_name, "user_id": ObjectId(user_id)})
+    return JSONResponse(
+        status_code=200, content={"message": "Bank account deleted successfully"}
+)
