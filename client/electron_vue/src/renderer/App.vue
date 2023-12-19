@@ -1,32 +1,22 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-
+import Networth from './components/Networth.vue';
+import OverviewVue from './components/Overview.vue';
 window.electronAPI.sendMessage('Hello from App.vue!');
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="homebar">
+    <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#transaction">Transaction</a></li>
+        <li><a href="#investment">Investment</a></li>
+        <li><a href="#plan">Plan</a></li>
+        <li><a href="#report">Report</a></li>
+    </ul>
   </div>
-  <HelloWorld msg="Vite + Vue" />
+  <section>
+    <div><Networth/></div>
+    <div class="screen"><OverviewVue/></div>
+  </section>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
