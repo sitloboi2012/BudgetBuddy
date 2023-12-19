@@ -3,7 +3,6 @@ from fastapi import APIRouter, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
 from models.users import UserInfo
 from constant import Message, Constant
-# from constant import Constant
 from pymongo import MongoClient
 import bcrypt
 from models.email import EmailSchema, send_email         
