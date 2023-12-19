@@ -5,12 +5,13 @@ from fastapi import APIRouter, File, UploadFile
 from fastapi.responses import JSONResponse
 from io import BytesIO
 from models.transaction import Transaction
+from bson import ObjectId 
 
 # Get the absolute path of the current directory
 current_directory = os.path.dirname(os.path.abspath(__file__))
 router = APIRouter(prefix="/api/v1", tags=["Import File"])
 client = MongoClient(host="mongodb+srv://phuchauxd12:Abcd0123@cluster0.lf8sh9p.mongodb.net/").get_database("dev")
-db = client.get_collection("TransactionHistory")
+db = client.get_collection("TRANSACTION_HISTORY")
 
 @router.post('/transaction')
 def TransactionHistory(csv_file: UploadFile = File(...)):
@@ -18,11 +19,12 @@ def TransactionHistory(csv_file: UploadFile = File(...)):
         # Read the CSV file
         headers1 = ['transaction_name','transaction_date','Amount','acccount_id','user_id','transaction_type', 'tag_id']
         df = pd.read_csv(BytesIO(csv_file.file.read()), names=headers1, skiprows= 1)
+        # df['transaction_date'] = df['transaction_date'].astype(str)
         data = df.to_dict(orient='records')
         for value in data:
             db.insert_one(
-                Transaction(transaction_name= value['transaction_name'],  transaction_date= value['transaction_date'], Amount= value["Amount"],
-                            transaction_type= value["transaction_type"]
+                Transaction(transaction_name= value['transaction_name'],   transaction_date= value["transaction_date"], Amount= value["Amount"],
+                            transaction_type= value["transaction_type"], user_id= ObjectId(value['user_id'])
                             ).dict()
             )
         return JSONResponse(content=data)
