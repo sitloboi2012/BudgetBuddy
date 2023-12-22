@@ -77,24 +77,7 @@ def verify_account_info(
         return True
     else:
         return False
-
-
-
-# def divided_account(user_id: str,account_name: str,account_type: str,current_balance: float,bank_name: str):
-#     if account_type in MODEL.value():
-#         bank = BANK_COLLECTION.find_one({"bank_name": bank_name})
-#         if bank is None:
-#             return False
-#         bank_id = bank["_id"]
-#     # Check if account is exist in accout database
-#     account = ACCOUNT_COLLECTION.find_one(
-#         {"bank_id": ObjectId(bank_id), "user_id": ObjectId(user_id)}
-#     )
-#     if account is None:
-#         account_id = create_new_account(user_id=user_id, bank_id=bank_id)
-#     else:
-#         account_id = account["_id"]
-    
+      
 def preprocess_current_balance(value):
     # Remove dots from the current_balance value
     return float(value.replace(".", ""))
