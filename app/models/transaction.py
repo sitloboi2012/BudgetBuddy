@@ -5,7 +5,7 @@ from pydantic.functional_validators import BeforeValidator
 from bson import ObjectId
 class Transaction(BaseModel):
     transaction_name : str = Field(alias="transaction_name", default=None)
-    transaction_date : datetime = Field(...,alias="transaction_date")
+    transaction_date : datetime.date = Field(...,alias="transaction_date")
     Amount : float = Field(...,alias="Amount")
     account_id: ObjectId = Field(alias="account_id", default=None)
     user_id: ObjectId = Field(alias="user_id", default=None)
@@ -16,10 +16,11 @@ class Transaction(BaseModel):
     def parse_amount(cls, value):
         return float(value.replace(".", ""))
     
-    # @validator("transaction_date", pre=True, allow_reuse=True)
-    # def date(cls, value):
-    #     input_date = datetime.strptime(value, "%d/%m/%Y")
-    #     return input_date
+    @validator("transaction_date", pre=True, allow_reuse=True)
+    def date(cls, value):
+        input_date = datetime.strptime(value, "%d/%m/%Y").date()
+        formatted_date = input_date.strftime("%d-%b-%Y")
+        return formatted_date
     
     class Config:
         allow_population_by_field_name = True
