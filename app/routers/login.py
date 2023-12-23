@@ -3,9 +3,10 @@ from fastapi.responses import JSONResponse
 from constant import Message, Constant
 from pymongo import MongoClient
 import bcrypt
+import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["User Login"])
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+client = MongoClient(host=Constant.MONGODB_URI, tlsCAFile=certifi.where(), tls=True).get_database("dev")
 db = client.get_collection("USERS")
 
 @router.post('/login', responses={401: {'model': Message}, 404: {'model': Message}})
