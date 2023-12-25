@@ -7,7 +7,8 @@ from constant import Constant
 from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
-from models.goal import InvestmentGoalModel, SavingGoalModel, GoalSettingBaseModel
+from typing import Optional
+from models.goal import GoalSettingBaseModel, GoalModelView
 
 router = APIRouter(prefix="/api/v1", tags=["Goal Setting"])
 client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
@@ -15,21 +16,17 @@ SAVING_GOAL_DB = client.get_collection("SAVING_GOAL_SETTINGS")
 INVESTMENT_GOAL_DB = client.get_collection("INVESTMENT_GOAL_SETTINGS")
 GOAL_SETTING_BASE = client.get_collection("GOAL_SETTINGS")
 
-# MODEL INITIALIZATION
-MODEL = {
-    "Saving": [SavingGoalModel, SAVING_GOAL_DB],
-    "Investment": [InvestmentGoalModel, INVESTMENT_GOAL_DB],
-}
 
-
-@router.post("/goal_setting/{user_id}/{account_id}")
+@router.post("/goal_saving_setting/{user_id}")
 def set_goal(
-    account_id: str,
-    account_type: str = Form(..., description="Account type"),
     goal_end_date: str = Form(..., description="Goal end date"),
     goal_created_date: str = Form(..., description="Goal created date"),
     goal_name: str = Form(..., description="Goal name"),
+    connected_account_name: Optional[str] = Form(..., description="Account id"),
+    goal_value: float = Form(..., description="Goal value"),
 ) -> JSONResponse:
+    
+    
     start_date = datetime.strptime(goal_created_date, "%Y-%m-%d").date()
     end_date = datetime.strptime(goal_end_date, "%Y-%m-%d").date()
 
@@ -41,27 +38,28 @@ def set_goal(
             status_code=400, detail="End date must be greater than start date"
         )
 
-    GOAL_SETTING_BASE.insert_one(
-        GoalSettingBaseModel(
-            goal_created_date=goal_created_date,
-            goal_end_date=goal_end_date,
-            goal_name=goal_name,
-            account_id=ObjectId(account_id),
-        ).dict()
-    )
-
-    goal_id = GOAL_SETTING_BASE.find_one(
-        {"goal_name": goal_name, "account_id": ObjectId(account_id)}
-    )["_id"]
-
-    print(goal_id)
-    """
-    if account_type == "Saving":
-        SAVING_GOAL_DB.insert_one(
-            SavingGoalModel(
-                goal_id=ObjectId(account_id),
-                saving_account_id=ObjectId(account_id),
-                saving_goal_value=0,
+    if connected_account_name is None:
+        GOAL_SETTING_BASE.insert_one(
+            GoalSettingBaseModel(
+                goal_created_date=goal_created_date,
+                goal_end_date = goal_end_date,
+                goal_name=goal_name,
+                saving_amount=goal_value,
             ).dict()
         )
-    """
+    else:
+        GOAL_SETTING_BASE.insert_one(
+            GoalSettingBaseModel(
+                goal_created_date=goal_created_date,
+                goal_end_date = goal_end_date,
+                goal_name=goal_name,
+                saving_amount=goal_value,
+                connected_account=ObjectId(connected_account_name),
+            ).dict()
+        )
+    
+    return JSONResponse(
+        status_code=200,
+        content = "Create Goal Saving Success"
+    )
+
