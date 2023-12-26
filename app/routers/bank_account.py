@@ -241,7 +241,6 @@ def update_account_info(
         JSONResponse: The response indicating the success of the update.
     """
     account_type_model = MODEL[account_type]
-    print(new_value)
 
     if "account_name" in new_value:
         account_type_model[1].update_one(

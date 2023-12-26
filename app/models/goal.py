@@ -7,6 +7,7 @@ from typing import Optional
 
 
 class GoalSettingBaseModel(BaseModel):
+    user_id: ObjectId = Field(..., description="User id")
     goal_created_date: str = Field(..., description="Goal created date")
     goal_name: str = Field(..., description="Goal name")
     goal_end_date: str = Field(None, description="Goal end date")
