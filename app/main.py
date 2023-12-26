@@ -12,9 +12,13 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json",
     docs_url="/api/v1/docs",
 )
+origins = [
+    "http://localhost:8081",  # Replace with the actual origin of your Vue.js app
+]
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
