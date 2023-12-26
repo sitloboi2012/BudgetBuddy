@@ -24,8 +24,22 @@ def set_goal(
     connected_account_id: Optional[str] = Form(None, description="Account id"),
     connected_account_name: Optional[str] = Form(None, description="Account name"),
     goal_value: float = Form(..., description="Goal value"),
-    
 ) -> JSONResponse:
+    """
+    Create a goal for a user.
+
+    Args:
+        user_id (str): The ID of the user.
+        goal_end_date (str): The end date of the goal.
+        goal_created_date (str): The created date of the goal.
+        goal_name (str): The name of the goal.
+        connected_account_id (Optional[str]): The ID of the connected account (optional).
+        connected_account_name (Optional[str]): The name of the connected account (optional).
+        goal_value (float): The value of the goal.
+
+    Returns:
+        JSONResponse: The response indicating the success of creating the goal.
+    """
     
     if GOAL_SETTING_BASE.find_one({"user_id": ObjectId(user_id), "goal_name": goal_name}):
         raise HTTPException(status_code=400, detail="Goal name already exists")
@@ -76,6 +90,20 @@ def get_single_goal_view(
     user_id: str,
     goal_id: str,
 ):
+    """
+    Retrieve a single goal view.
+
+    Args:
+        user_id (str): The ID of the user.
+        goal_id (str): The ID of the goal.
+
+    Returns:
+        JSONResponse: The JSON response containing the goal view.
+    
+    Raises:
+        HTTPException: If the goal is not found.
+    """
+    
     goal = GOAL_SETTING_BASE.find_one({"_id": ObjectId(goal_id), "user_id": ObjectId(user_id)})
     if goal is None:
         raise HTTPException(status_code=400, detail="Goal not found")
@@ -88,6 +116,15 @@ def get_single_goal_view(
 def get_all_goal_view(
     user_id: str,
 ):
+    """
+    Retrieve all goals for a given user.
+
+    Args:
+        user_id (str): The ID of the user.
+
+    Returns:
+        JSONResponse: A JSON response containing the goals as a list of dictionaries.
+    """
     goals = GOAL_SETTING_BASE.find({"user_id": ObjectId(user_id)})
     return JSONResponse(
         status_code=200,
@@ -105,6 +142,23 @@ def update_goal(
     connected_account_name: Optional[str] = Form(None, description="Account name"),
     goal_value: float = Form(None, description="Goal value"),
 ) -> JSONResponse:
+    """
+    Update a goal in the database.
+
+    Args:
+        user_id (str): The ID of the user.
+        goal_id (str): The ID of the goal to be updated.
+        goal_end_date (str, optional): The new end date of the goal. Defaults to None.
+        goal_created_date (str, optional): The new created date of the goal. Defaults to None.
+        goal_name (str, optional): The new name of the goal. Defaults to None.
+        connected_account_id (str, optional): The new account ID connected to the goal. Defaults to None.
+        connected_account_name (str, optional): The new account name connected to the goal. Defaults to None.
+        goal_value (float, optional): The new value of the goal. Defaults to None.
+
+    Returns:
+        JSONResponse: The response indicating the success of the update operation.
+    """
+    
     goal = GOAL_SETTING_BASE.find_one({"_id": ObjectId(goal_id), "user_id": ObjectId(user_id)})
     if goal is None:
         raise HTTPException(status_code=400, detail="Goal not found")
@@ -142,6 +196,16 @@ def delete_goal(
     user_id: str,
     goal_id: str,
 ) -> JSONResponse:
+    """
+    Deletes a goal from the goal setting database.
+
+    Args:
+        user_id (str): The ID of the user.
+        goal_id (str): The ID of the goal to be deleted.
+
+    Returns:
+        JSONResponse: The response indicating the success of the deletion.
+    """
     goal = GOAL_SETTING_BASE.find_one({"_id": ObjectId(goal_id), "user_id": ObjectId(user_id)})
     if goal is None:
         raise HTTPException(status_code=400, detail="Goal not found")
