@@ -1,4 +1,4 @@
 account_name,account_type ,current_balance,bank_name
-test1,Investment,400.000.000,VIETCOMBANK
-test2,Investment,600.000.000,VIETCOMBANK
-test3,Saving,800.000.000,VIB
+test_import_1,Investment,400000000,VIETCOMBANK
+test_import_2,Investment,600000000,VIETCOMBANK
+test_import3,Saving,800000000,TECHCOMBANK

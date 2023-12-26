@@ -78,9 +78,6 @@ def verify_account_info(
     else:
         return False
       
-def preprocess_current_balance(value):
-    # Remove dots from the current_balance value
-    return float(value.replace(".", ""))
 
 
 @router.post('/{user_id}/bank_account_import')
@@ -89,7 +86,6 @@ def bank_account_import(user_id: str, csv_file: UploadFile = File(...)):
     df = pd.read_csv(BytesIO(csv_file.file.read()), names=headers, skiprows= 1)
     data = df.to_dict(orient='records')
     for value in data:
-        value["current_balance"] = preprocess_current_balance(value["current_balance"])
         if value["account_type"] not in MODEL:
             return JSONResponse(
             status_code=422, content={"message": f"Invalid account type:{value} /n {value["account_type"]}"}
