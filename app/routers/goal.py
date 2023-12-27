@@ -75,7 +75,7 @@ def set_goal(
                 goal_end_date = goal_end_date,
                 goal_name=goal_name,
                 saving_amount=goal_value,
-                connected_account_id=ObjectId(connected_account_name),
+                connected_account_id=ObjectId(connected_account_id),
                 connected_account_name=connected_account_name
             ).dict()
         )

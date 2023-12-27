@@ -13,7 +13,7 @@ class GoalSettingBaseModel(BaseModel):
     goal_end_date: str = Field(None, description="Goal end date")
     saving_amount: float | int = Field(..., description="Goal value")
     connected_account_name: Optional[str] = Field(None, description="Account id")
-    connected_account_id: Optional[str] = Field(None, description="Account id")
+    connected_account_id: Optional[ObjectId] = Field(None, description="Account id")
 
     class Config:
         allow_population_by_field_name = True
