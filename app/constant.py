@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from enum import StrEnum
+#from enum import StrEnum
 from pydantic import BaseModel
 
 import os
@@ -9,7 +9,7 @@ import os
 # Load environment variables from the local.env file
 load_dotenv(os.path.join(os.path.dirname(__file__), "local.env"))
 
-class Constant(StrEnum):
+class Constant():
     MONGODB_URI = os.environ["MONGODB_URI"]
 
 
