@@ -9,11 +9,7 @@ class BillCreate(BaseModel):
     recurrent_reminder: bool= Field(default= False, description="Want to reminder about the bill")
     recurrent_date_value: str = Field(..., description="Date of the bill")
 
-    @validator("recurrent_date_value", pre=True, allow_reuse=True)
-    def date(cls, value):
-        input_date = datetime.strptime(value, "%d/%m/%Y").date()
-        formatted_date = input_date.strftime("%d-%b-%Y")
-        return formatted_date
+
     
     
     class Config:

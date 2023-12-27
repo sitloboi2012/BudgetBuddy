@@ -16,12 +16,17 @@ def create_bill(
     bill_name: str = Form(..., description="Name of the bill"),
     bill_value: float = Form(..., description="Amount of the bill"),
     recurrent_reminder: bool = Form(..., description="Want to reminder about the bill"),
-    recurrent_date_value: str = Form(..., description="Date of the bill (format: %d/%m/%Y)"),
+    recurrent_date_value: str = Form(..., description="Date of the bill"),
 ):
     existing_bill = db.find_one({"user_id": ObjectId(user_id),'bill_name': bill_name})
     if existing_bill is not None:
         return JSONResponse(status_code=409, content={"message": "Bill already exists"})
     
+    try:
+        datetime.strptime(recurrent_date_value, "%Y-%m-%d")
+    except ValueError:
+        return JSONResponse(status_code=422, content="Invalid date format. Please use YYYY-MM-DD.")
+
     try:
         db.insert_one(BillCreate(user_id= ObjectId(user_id), bill_name= bill_name, bill_value= bill_value, recurrent_reminder= recurrent_reminder,
                                  recurrent_date_value= recurrent_date_value).dict())
@@ -52,17 +57,34 @@ def get_bill(user_id: str,):
 
 
 @router.put("/user_bill/{user_id}/{bill_id}/update")
-def update_bill(user_id: str,
-    bill_id: str ,
-    bill_name: str = Form(..., description="Name of the bill"),
-    bill_value: float = Form(..., description="Amount of the bill"),
-    recurrent_reminder: bool = Form(..., description="Want to reminder about the bill(format: %d/%m/%Y)"),
-    recurrent_date_value: str = Form(..., description="Date of the bill"),):
-    db.update_one({"user_id": ObjectId(user_id), "_id": ObjectId(bill_id)},
-                    {"$set": {"bill_name": bill_name,"bill_value": bill_value, "recurrent_reminder": recurrent_reminder,
-                              "recurrent_date_value": datetime.strptime(recurrent_date_value, "%d/%m/%Y").strftime("%d-%b-%Y")}})
-    return JSONResponse(status_code=200, content={"message": "Bill updated successfully"}
-    )
+def update_bill(
+    user_id: str,
+    bill_id: str,
+    bill_name: str = Form(None, description="Name of the bill"),
+    bill_value: float = Form(None, description="Amount of the bill"),
+    recurrent_reminder: bool = Form(None, description="Want to reminder about the bill"),
+    recurrent_date_value: str = Form(None, description="Date of the bill "),
+):
+    update_data = {}
+
+    if bill_name is not None:
+        update_data["bill_name"] = bill_name
+
+    if bill_value is not None:
+        update_data["bill_value"] = bill_value
+
+    if recurrent_reminder is not None:
+        update_data["recurrent_reminder"] = recurrent_reminder
+
+    if recurrent_date_value is not None:
+        try:
+            datetime.strptime(recurrent_date_value, "%Y-%m-%d")
+        except ValueError:
+            return JSONResponse(status_code=422, content="Invalid date format. Please use YYYY-MM-DD.")
+        update_data["recurrent_date_value"] = recurrent_date_value
+
+    db.update_one({"user_id": ObjectId(user_id), "_id": ObjectId(bill_id)}, {"$set": update_data})
+    return JSONResponse(status_code=200, content={"message": "Bill updated successfully"})
 
 @router.delete("/user_bill/{user_id}/{bill_id}/delete")
 def delete_bill(user_id: str,

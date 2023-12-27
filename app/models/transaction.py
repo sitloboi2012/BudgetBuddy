@@ -14,11 +14,6 @@ class Transaction(BaseModel):
     transaction_type: str = Field(alias="transaction_type", default=None)
 
     
-    @validator("transaction_date", pre=True, allow_reuse=True)
-    def date(cls, value):
-        input_date = datetime.strptime(value, "%d/%m/%Y").date()
-        formatted_date = input_date.strftime("%d-%b-%Y")
-        return formatted_date
     
     class Config:
         allow_population_by_field_name = True

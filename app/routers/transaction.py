@@ -17,10 +17,56 @@ db = client.get_collection("TRANSACTION_HISTORY")
 BANK_COLLECTION = client.get_collection("BANK_INFO")
 ACCOUNT_COLLECTION = client.get_collection("ACCOUNTS")
 
+@router.post('/transaction/{user_id}/create')
+def post_transaction(user_id: str,
+                    transaction_name: str = Form(..., description="Name of the transaction"),
+                    Payee: str = Form(..., description="Payee of the transaction"),
+                    transaction_date: str = Form(..., description="Date of the transaction"),
+                    Amount: float = Form(..., description="Amount of the transaction"),
+                    bank_name: str = Form(..., description="Name of the bank"),
+                    transaction_type: str = Form(..., description="Type of the transaction"),):
+    try:
+        bank = BANK_COLLECTION.find_one({"bank_name": bank_name})
+        if bank is None:
+            return JSONResponse(status_code=422, content={ "message": f"Invalid bank name"})
+        bank_id = bank["_id"]
 
+        # Check if account exists
+        account = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id), "bank_id": ObjectId(bank_id)})
+        if account is None:
+            return JSONResponse(status_code=404, content={'message': "Account does not exist."})
+        account_id = account["_id"]
+                
+        # Check if the transaction already exists 
+        existing_transaction = db.find_one({
+            "transaction_name": transaction_name,
+            "Payee": Payee,
+            "transaction_date": transaction_date,
+            "Amount": Amount,
+            "bank_name": bank_name,
+            "account_id": ObjectId(account_id),
+            "transaction_type": transaction_type,
+            "user_id": ObjectId(user_id)
+        })
+        if existing_transaction is not None:
+            return JSONResponse(status_code=409, content={"message": "Transaction already exists"})
+        
+        try:
+            datetime.strptime(transaction_date, "%Y-%m-%d")
+        except ValueError:
+            return JSONResponse(status_code=422, content={"message": f"Invalid date format for transaction_date. Please use YYYY-MM-DD."})
+
+        db.insert_one(
+            Transaction(transaction_name= transaction_name, Payee= Payee, transaction_date= transaction_date, Amount= Amount,
+                        bank_name= bank_name, account_id=ObjectId(account_id), transaction_type= transaction_type, user_id= ObjectId(user_id)
+                        ).dict()
+        )
+        return JSONResponse(content={"message": "Transaction created successfully"})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)})
 
 @router.post('/transaction/{user_id}/import_csv')
-def post_transaction(user_id: str,csv_file: UploadFile = File(...)):
+def import_transaction(user_id: str,csv_file: UploadFile = File(...)):
     try:
         # Read the CSV file
         headers = ['transaction_name','Payee','transaction_date','Amount','bank_name','transaction_type']
@@ -40,12 +86,12 @@ def post_transaction(user_id: str,csv_file: UploadFile = File(...)):
             if account is None:
                 return JSONResponse(status_code=404, content={'message': "Account does not exist."})
             account_id = account["_id"]
-
+            
             # Check if the transaction already exist 
             existing_transaction = db.find_one({
                 "transaction_name": value['transaction_name'],
                 "Payee": value['Payee'],
-               "transaction_date":datetime.strptime(value["transaction_date"], "%d/%m/%Y").strftime("%d-%b-%Y"),
+               "transaction_date":value["transaction_date"],
                 "Amount": value["Amount"],
                 "bank_name": value["bank_name"],
                 "account_id": ObjectId(account_id),
@@ -54,6 +100,12 @@ def post_transaction(user_id: str,csv_file: UploadFile = File(...)):
             })
             if existing_transaction is not None:
                 return JSONResponse(status_code=409, content={"message": "Transaction already exists"})
+            try:
+                datetime.strptime(value["transaction_date"], "%Y-%m-%d")
+            except ValueError:
+                return JSONResponse(status_code=422, content={"message": f"Invalid date format for transaction_date: {value['transaction_date']}. Please use YYYY-MM-DD."})
+
+            
             db.insert_one(
                 Transaction(transaction_name= value['transaction_name'],Payee= value['Payee'], transaction_date= value["transaction_date"], Amount= value["Amount"],
                             bank_name= value["bank_name"],account_id=ObjectId(account_id), transaction_type= value["transaction_type"], user_id= ObjectId(user_id)
@@ -61,7 +113,7 @@ def post_transaction(user_id: str,csv_file: UploadFile = File(...)):
             )
         return JSONResponse(content={"message": "Transaction created successfully"})
     except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+        return JSONResponse(content={"error": str(e)})
 
 @router.get("/transaction/{user_id}")
 def get_transaction(user_id: str):
@@ -89,41 +141,53 @@ def get_transaction(user_id: str):
 def update_transaction(
     user_id: str,
     transaction_id: str,
-    transaction_name: str = Form(..., description="Name of the transaction"),
-    Payee: str = Form(..., description="Payee of the transaction"),
-    transaction_date: str = Form(..., description="Date of the transaction (format: %d/%m/%Y)"),
-    Amount: float = Form(..., description="Amount of the transaction"),
-    bank_name: str = Form(..., description="Name of the bank"),
-    transaction_type: str = Form(..., description="Type of the transaction"),
+    transaction_name: str = Form(None, description="Name of the transaction"),
+    Payee: str = Form(None, description="Payee of the transaction"),
+    transaction_date: str = Form(None, description="Date of the transaction"),
+    Amount: float = Form(None, description="Amount of the transaction"),
+    bank_name: str = Form(None, description="Name of the bank"),
+    transaction_type: str = Form(None, description="Type of the transaction"),
 ):
     try:
+        update_data = {}
         # Check if the bank exist
-        bank = BANK_COLLECTION.find_one({"bank_name": bank_name})
-        if bank is None:
-            return JSONResponse(status_code=422, content={ "message": f"Invalid bank name: {bank_name}"})
-        bank_id = bank["_id"]
+        if bank_name is not None:
+            bank = BANK_COLLECTION.find_one({"bank_name": bank_name})
+            if bank is None:
+                return JSONResponse(status_code=422, content={ "message": f"Invalid bank name: {bank_name}"})
+            bank_id = bank["_id"]        
+            # Check if account exist
+            account = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id), "bank_id": ObjectId(bank_id)})
+            if account is None:
+                return JSONResponse(status_code=404, content={'message': "Account does not exist."})
+            update_data["account_id"] = account["_id"]
+            update_data["bank_name"] = bank_name
 
-        # Check if account exist
-        account = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id), "bank_id": ObjectId(bank_id)})
-        if account is None:
-            return JSONResponse(status_code=404, content={'message': "Account does not exist."})
-        account_id = account["_id"]
-    
+        if transaction_name is not None:
+            update_data["transaction_name"] = transaction_name
+
+        if Payee is not None:
+            update_data["Payee"] = Payee
+
+        if Amount is not None:
+            update_data["Amount"] = Amount
+
+        if transaction_type is not None:
+            update_data["transaction_type"] = transaction_type
+
+        if transaction_date is not None:
+            try:
+                datetime.strptime(transaction_date, "%Y-%m-%d")
+            except ValueError:
+                return JSONResponse(status_code=422, content="Invalid date format. Please use YYYY-MM-DD.")
+
+            update_data["transaction_date"] = transaction_date
+
         # Update the transaction
         db.update_one(
-            {"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)},
-            {
-                "$set": {
-                    "transaction_name": transaction_name,
-                    "Payee": Payee,
-                    "transaction_date": datetime.strptime(transaction_date, "%d/%m/%Y").strftime("%d-%b-%Y"),
-                    "Amount": Amount,
-                    "bank_name": bank_name,
-                    "transaction_type": transaction_type,
-                    "account_id": account_id
-                }
-            }
-        )
+                {"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)},
+                {"$set": update_data}
+            )
         return JSONResponse(content={"message": "Transaction updated successfully"})
     except Exception as e:
         return JSONResponse(content={"error": str(e)})

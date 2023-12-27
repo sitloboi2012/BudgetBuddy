@@ -31,4 +31,4 @@ app.include_router(transaction.router)
 app.include_router(bank_account_import.router)
 app.include_router(user_bills.router)
 if __name__ == "__main__":
-    uvicorn.run("main:app", workers=1, host="0.0.0.0", port=8080, reload= True)
+    uvicorn.run("main:app", workers=1, host="0.0.0.0", port=8080)
