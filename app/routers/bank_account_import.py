@@ -88,7 +88,7 @@ def bank_account_import(user_id: str, csv_file: UploadFile = File(...)):
     for value in data:
         if value["account_type"] not in MODEL:
             return JSONResponse(
-            status_code=422, content={"message": f"Invalid account type:{value} /n {value["account_type"]}"}
+            status_code=422, content={"message": f"Invalid account type:{value} /n {value['account_type']}"}
         )
         bank = BANK_COLLECTION.find_one({"bank_name": value["bank_name"]})
         if bank is None:
