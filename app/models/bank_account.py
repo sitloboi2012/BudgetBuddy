@@ -31,7 +31,7 @@ class BaseAccount(BaseModel):
         }
 
 class SavingOrInvestmentAccount(BaseAccount):
-    goal_id: str = Field(None, description="Goal id of the bank account")
+    goal_id: Optional[str] = Field(None, description="Goal id of the bank account")
 
 class ExpenseAccount(BaseAccount):
     tag_id: str = Field(None, description="Tag id of the bank account")
