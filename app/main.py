@@ -6,12 +6,14 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+
 from routers import (
     register, newsletter,
     bank_account, bank_info,
     profile, login, goal,
     transaction, bank_account_import,
     user_bills, plan_spending, stock)
+
 
 app = FastAPI(
     openapi_url="/api/v1/openapi.json",
