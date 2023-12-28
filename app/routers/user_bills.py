@@ -48,10 +48,31 @@ def get_bill(user_id: str,):
         ]
 
     if not array:
-        return JSONResponse(status_code=404, content={'message': "User does not exist or recurrent remider is false."})
-        
+        return JSONResponse(status_code=404, content={'message': "User does not exist or recurrent remider is false."})   
     return JSONResponse(content=array)
 
+
+@router.get("/user_bill/{user_id}/sorted", responses = {409: {"model": Message},
+                                      422: {"model": Message},
+                                      404: {"model": Message}})
+def sorted_bill(user_id: str,):
+    list_bills = db.find({"user_id": ObjectId(user_id)})
+    array = [
+            GetBillInformation(
+                bill_id = str(value["_id"]),
+                bill_name=value["bill_name"],
+                bill_value=value["bill_value"],
+                recurrent_date_value=value["recurrent_date_value"],
+                recurrent_reminder=value["recurrent_reminder"]
+            ).dict()
+            for value in list_bills if value["recurrent_reminder"] == True 
+        ]
+
+    if not array:
+        return JSONResponse(status_code=404, content={'message': "User does not exist or recurrent remider is false."})
+    # sorted in ascending order of dates
+    sorted_array = sorted(array, key=lambda x: datetime.strptime(x['recurrent_date_value'], '%Y-%m-%d'))    
+    return JSONResponse(content=sorted_array)
 
 @router.put("/user_bill/{user_id}/{bill_id}/update")
 def update_bill(

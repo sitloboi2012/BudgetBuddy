@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, File, UploadFile
+import pandas as pd
+from io import BytesIO
 from fastapi.responses import JSONResponse
 from constant import Constant
 from pymongo import MongoClient
@@ -163,6 +165,36 @@ def create_account_manually(
             status_code=422, content={"message": "Bank account already exists"}
         )
 
+@router.post('/bank_account/{user_id}/bank_account_import')
+def bank_account_import(user_id: str, csv_file: UploadFile = File(...)):
+    headers = ["account_name", "account_type", "current_balance", "bank_name"]
+    df = pd.read_csv(BytesIO(csv_file.file.read()), names=headers, skiprows= 1)
+    data = df.to_dict(orient='records')
+    for value in data:
+        if value["account_type"] not in MODEL:
+            return JSONResponse(
+            status_code=422, content={"message": f"Invalid account type:{value}"}
+        )
+        bank = BANK_COLLECTION.find_one({"bank_name": value["bank_name"]})
+        if bank is None:
+            return JSONResponse(status_code=422, content={ "message": f"Invalid bank name: {value}"})
+        bank_id = bank["_id"]
+        account = ACCOUNT_COLLECTION.find_one({"bank_id": ObjectId(bank_id), "user_id": ObjectId(user_id)})
+        if account is None:
+            account_id = create_new_account_generic(user_id=user_id, bank_id=bank_id)
+        else:
+            account_id = account["_id"]
+        created_account = verify_account_info(
+            account_name=value["account_name"],
+            account_type_model=MODEL[value["account_type"]],
+            account_id=ObjectId(account_id),
+            user_id=ObjectId(user_id),
+            bank_id=ObjectId(bank_id),
+            current_balance= value["current_balance"],
+        )
+        if created_account == False:
+            return JSONResponse(status_code=422, content={"message": "Bank account already exists"})
+    return JSONResponse( content= data)
 
 @router.get(
     "bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
