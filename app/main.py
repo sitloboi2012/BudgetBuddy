@@ -12,7 +12,7 @@ from routers import (
     bank_account, bank_info,
     profile, login, goal,
     transaction, bank_account_import,
-    user_bills, plan_spending, stock, report_api)
+    user_bills, plan_spending, investment_api)
 
 
 app = FastAPI(
@@ -29,7 +29,7 @@ app.add_middleware(
 
 app.include_router(register.router)
 app.include_router(plan_spending.router)
-app.include_router(stock.router)
+app.include_router(investment_api.router)
 app.include_router(newsletter.router)
 app.include_router(bank_account.router)
 app.include_router(bank_info.router)
