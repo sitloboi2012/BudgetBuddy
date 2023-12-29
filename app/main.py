@@ -12,7 +12,7 @@ from routers import (
     bank_account, bank_info,
     profile, login, goal,
     transaction, bank_account_import,
-    user_bills, plan_spending, investment_api)
+    user_bills, plan_spending, investment_api, report_api)
 
 
 app = FastAPI(
