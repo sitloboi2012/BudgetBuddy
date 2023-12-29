@@ -39,3 +39,5 @@ class GetTransactionInformation(BaseModel):
             ObjectId: str
         }
 
+class MonthlyTransaction(BaseModel):
+    list_of_transactions: list[GetTransactionInformation] = Field(alias="list_of_transactions", default=None)
