@@ -9,3 +9,7 @@ class Stock(BaseModel):
 
 class ListOfStocks(BaseModel):
     list_of_stocks: list[Stock] = []
+
+class GetInvestedAccountData(BaseModel):
+    account_name: str = Field(..., description="Account name of the bank account")
+    current_balance: float = Field(..., description="Invested amount of the bank account")
