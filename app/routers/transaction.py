@@ -138,6 +138,18 @@ def import_transaction(user_id: str,csv_file: UploadFile = File(...)):
                             transaction_type= value["transaction_type"], user_id= ObjectId(user_id)
                             ).dict()
             )
+            if value["transaction_type"] == "Income":
+                MODEL[value["account_type"]].update_one(
+                    {"user_id": ObjectId(user_id), "account_name": value["account_name"]},
+                    {"$inc": {"current_balance": value["Amount"]}}
+                )
+            else:
+                MODEL[value["account_type"]].update_one(
+                    {"user_id": ObjectId(user_id), "account_name": value["account_name"]},
+                    {"$inc": {"current_balance": -value["Amount"]}}
+                )
+                update_expense_value_transaction(value["transaction_type"], value["Amount"], user_id)
+
         return JSONResponse(content={"message": "Transaction created successfully"})
     except Exception as e:
         return JSONResponse(content={"error": str(e)})
@@ -165,80 +177,23 @@ def get_transaction(user_id: str):
     return JSONResponse(content=array)
 
 
-@router.put("/transaction/{user_id}/{transaction_id}/update")
-def update_transaction(
-    user_id: str,
-    transaction_id: str,
-    transaction_name: str = Form(None, description="Name of the transaction"),
-    Payee: str = Form(None, description="Payee of the transaction"),
-    transaction_date: str = Form(None, description="Date of the transaction"),
-    Amount: float = Form(None, description="Amount of the transaction"),
-    account_name: str = Form(None, description="Name of the account"),
-    account_type: str = Form(None, description="Type of the account"),
-    transaction_type: str = Form(None, description="Type of the transaction"),
-):
-    try:
-        transaction = db.find_one({"_id": ObjectId(transaction_id)})
-        update_data = {}
-
-         # Check if user changes the account_type and account name
-        if account_type is not None and account_name is not None:
-            if account_type not in MODEL:
-                return JSONResponse(status_code=422, content={"message": "Invalid account type"})
-            account = MODEL[account_type].find_one({"user_id": ObjectId(user_id), "account_name": account_name})
-            if account is None:
-                return JSONResponse(status_code=404, content={'message': "Account does not exist."})
-            update_data["account_type"] = account_type
-            update_data["account_name"] = account_name
-            update_data["account_id"] = account["_id"]
-            
-        # Check if user only s the account_type
-        elif account_type is not None:
-            if account_type not in MODEL:
-                return JSONResponse(status_code=422, content={"message": "Invalid account type"})
-            account = MODEL[account_type].find_one({"user_id": ObjectId(user_id), "account_name": transaction["account_name"]})
-            if account is None:
-                return JSONResponse(status_code=404, content={'message': "Account does not exist."})
-            update_data["account_type"] = account_type
-            update_data["account_id"] = account["_id"]
-                 
-        # Check if user only changes the account_type
-        elif account_name is not None:
-            account = MODEL[transaction["account_type"]].find_one({"user_id": ObjectId(user_id), "account_name": account_name})
-            if account is None:
-                return JSONResponse(status_code=404, content={'message': "Account does not exist."})
-            update_data["account_name"] = account_name
-            update_data["account_id"] = account["_id"]
-
-        if transaction_name is not None:
-            update_data["transaction_name"] = transaction_name
-
-        if Payee is not None:
-            update_data["Payee"] = Payee
-
-        if Amount is not None:
-            update_data["Amount"] = Amount
-
-        if transaction_type is not None:
-            update_data["transaction_type"] = transaction_type
-
-        if transaction_date is not None:
-            update_data["transaction_date"] = transaction_date
-
-        # Update the transaction
-        db.update_one(
-                {"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)},
-                {"$set": update_data}
-            )
-        return JSONResponse(content={"message": "Transaction updated successfully"})
-    except Exception as e:
-        return JSONResponse(content={"error": str(e)})
-
-
 
 @router.delete("/transaction/{user_id}/{transaction_id}/delete")
 def delete_transaction(user_id: str, transaction_id: str):
     try:
+        transaction = db.find_one({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
+        Amount = -transaction["Amount"]
+        if transaction["transaction_type"] == "Income":
+            MODEL[transaction["account_type"]].update_one(
+                {"user_id": ObjectId(user_id), "account_name": transaction["account_name"]},
+                {"$inc": {"current_balance": Amount}}
+            )
+        else:
+            MODEL[transaction["account_type"]].update_one(
+                {"user_id": ObjectId(user_id), "account_name": transaction["account_name"]},
+                {"$inc": {"current_balance": -Amount}}
+            )
+        update_expense_value_transaction(transaction["transaction_type"], Amount, user_id)
         # Delete the transaction
         db.find_one_and_delete({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
 
