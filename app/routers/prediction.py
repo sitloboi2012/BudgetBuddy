@@ -44,8 +44,7 @@ def income_prediction(past: int, future: int, user_id):
         df['transaction_date'] = pd.to_datetime(df['transaction_date'], dayfirst=True)
         prediction = ForecasterAutoreg(regressor = RandomForestRegressor(), lags = d_past)
         prediction.fit(y = df['Amount'])
-        forecasting = prediction.predict(steps=d_future).to_dict()
-        forecasting = jsonable_encoder(forecasting)
+        forecasting = jsonable_encoder(prediction.predict(steps=d_future).to_dict())
         return forecasting
     
     return recursive_prediction(past, future)
