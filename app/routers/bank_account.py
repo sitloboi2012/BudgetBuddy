@@ -79,7 +79,7 @@ def verify_account_info(
     """
     if (
         account_type_model[1].find_one(
-            {"account_name": account_name, "bank_id": bank_id}
+            {"account_name": account_name, "bank_id": bank_id,  "user_id": user_id},
         )
         is None
     ):
@@ -246,13 +246,15 @@ def get_all_account_data(user_id: str):
     Raises:
         None.
     """
-    account_id = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id)})["_id"]
+    list_account_id = [account["_id"] for account in ACCOUNT_COLLECTION.find({"user_id": ObjectId(user_id)})]
 
     result = []
     for key, value in MODEL.items():
-        data = value[1].find_one({"account_id": ObjectId(account_id)})
-        if data is not None:
-            result.append([data["account_name"], data["current_balance"]])
+            for account_id in list_account_id:
+                list_data = value[1].find({"account_id": ObjectId(account_id)})
+                if list_data:
+                    for data in list_data:
+                        result.append([data["account_name"], data["current_balance"], key])
 
     return GetAllAccountName(list_account_name=result)
 
