@@ -24,12 +24,11 @@ def income_prediction(past: int, future: int):
         
         """This combined all data values that has the same dates into one
         Which means that, there will be no duplicated days for the same month"""
-        
         df = df.groupby('date').sum().reset_index().set_index('date')
         future = d_future 
         past = d_past
         prediction = ForecasterAutoreg(regressor = LinearRegression(), lags = past)
-        prediction.fit(y = df['total_income'])
+        prediction.fit(y = df['Amount'])
         forecasting = prediction.predict(steps=future)
         return (forecasting)
     return (recursive_prediction(past, future))
