@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/v1", tags=["Income Prediction"])
 client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
 db = client.get_collection("TRANSACTION_HISTORY")
 
-@router.get('/')
+@router.get('/get_prediction')
 def income_prediction(future: int, past: int):
     all_df = db.find()
     def recursive_prediction(d_past, d_future ):
