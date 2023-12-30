@@ -14,7 +14,7 @@ client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
 db = client.get_collection("TRANSACTION_HISTORY")
 
 @router.get('/get_prediction')
-def income_prediction(future: int, past: int):
+def income_prediction(past: int, future: int):
     all_df = db.find()
     def recursive_prediction(d_past, d_future ):
         df = pd.DataFrame(all_df)
