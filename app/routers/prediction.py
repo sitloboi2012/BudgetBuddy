@@ -1,4 +1,3 @@
-import warnings
 from bson import ObjectId
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
@@ -10,7 +9,7 @@ import pandas as pd
 from models.transaction import GetTransactionInformation
 from pymongo import MongoClient
 from skforecast.ForecasterAutoreg import ForecasterAutoreg
-warnings.filterwarnings('ignore')
+
 
 # Connect to DB
 router = APIRouter(prefix="/api/v1", tags=["Income Prediction"])
@@ -45,7 +44,6 @@ def income_prediction(user_id:str):
             df = df[headers]
             df['transaction_date'] = pd.to_datetime(df['transaction_date'], dayfirst=True)
             past =(len(df['transaction_date'].unique())-1)
-
             """ Past will fetch all the history transaction date of the user,
             combined, all the dates that has the same day, into one. We then use that data to make prediction
             for the upcoming 6 months."""
@@ -53,5 +51,6 @@ def income_prediction(user_id:str):
             prediction.fit(y = df['Amount'])
             forecasting = jsonable_encoder(prediction.predict(steps=d_future).to_dict())
             return forecasting
+        
     #Predict the next 6 months of income = 180 days.
     return JSONResponse(content=recursive_prediction(180))
