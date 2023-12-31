@@ -10,6 +10,7 @@ from models.bank_account import (
     AccountGeneric,
     BaseAccount,
     GetAccountInformation,
+    GetAllAccountName,
 )
 from bson import ObjectId
 
@@ -164,7 +165,7 @@ def create_account_manually(
 
 
 @router.get(
-    "/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
+    "/bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
 )
 def get_bank_account_info(
     user_id: str,
@@ -199,6 +200,29 @@ def get_bank_account_info(
         current_balance=account_data["current_balance"],
     )
 
+@router.get("/{user_id}")
+def get_all_account_data(user_id: str):
+    """
+    Retrieve all account name of a user.
+
+    Args:
+        user_id (str): The ID of the user.
+
+    Returns:
+        GetAllAccountName: The list of account name of the user.
+
+    Raises:
+        None.
+    """
+    account_id = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id)})["_id"]
+
+    result = []
+    for key, value in MODEL.items():
+        data = value[1].find_one({"account_id": ObjectId(account_id)})
+        if data is not None:
+            result.append([data["account_name"], data["current_balance"]])
+
+    return GetAllAccountName(list_account_name=result)
 
 @router.put("/{user_id}/{account_type}/{account_name}")
 def update_account_info(
@@ -217,7 +241,6 @@ def update_account_info(
         JSONResponse: The response indicating the success of the update.
     """
     account_type_model = MODEL[account_type]
-    print(new_value)
 
     if "account_name" in new_value:
         account_type_model[1].update_one(
