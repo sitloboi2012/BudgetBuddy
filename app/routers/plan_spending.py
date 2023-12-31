@@ -38,10 +38,13 @@ def create_spending(
 
 @router.get("/plan_spending/{user_id}/{timeframe}")
 def get_all_spending(user_id: str, timeframe: str):
-    spending = PLANNING_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id), "time_duration": timeframe})
-    return JSONResponse(
-        status_code=200,
-        content=[PlannedSpendingModelView(**spending).dict() for spending in spending])
+    spendings = PLANNING_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id), "time_duration": timeframe})
+    list_speding = []
+    for spending in spendings:
+        spending_dict = PlannedSpendingModelView(**spending).dict()
+        spending_dict["id"] = str(spending["_id"])
+        list_speding.append(spending_dict) 
+    return JSONResponse(status_code=200,content= list_speding)
 
 @router.put("/plan_spending/{user_id}/{spending_id}")
 def update_spending(
