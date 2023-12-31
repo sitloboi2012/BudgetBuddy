@@ -17,9 +17,10 @@ router = APIRouter(prefix="/api/v1", tags=["Income Prediction"])
 client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
 db = client.get_collection("TRANSACTION_HISTORY")
 
-      
+#Get route of prediction
 @router.get('/prediction/{user_id}')
 def income_prediction(user_id:str):
+    #Check to see if user ID exist
     list_transaction = db.find({"user_id": ObjectId(user_id)})
     array = [
            GetTransactionInformation(
@@ -36,7 +37,8 @@ def income_prediction(user_id:str):
         ]
     if not array:
         return JSONResponse(status_code=404, content={'message': "Transaction does not exist."})
-        
+    
+    #Fetch history transaction to predict 
     def recursive_prediction(d_future):
             df = pd.DataFrame(array)
             headers = ['transaction_date', 'Amount']    
@@ -51,5 +53,5 @@ def income_prediction(user_id:str):
             prediction.fit(y = df['Amount'])
             forecasting = jsonable_encoder(prediction.predict(steps=d_future).to_dict())
             return forecasting
-
+    #Predict the next 6 months of income = 180 days.
     return JSONResponse(content=recursive_prediction(180))
