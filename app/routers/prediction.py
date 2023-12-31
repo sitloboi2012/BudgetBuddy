@@ -18,7 +18,7 @@ client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
 db = client.get_collection("TRANSACTION_HISTORY")
 
 @router.get('/prediction/{user_id}')
-def income_prediction(past: int, future: int, user_id):
+def income_prediction(past: int, future: int, user_id:str):
     list_transaction = db.find({"user_id": ObjectId(user_id)})
     array = [
            GetTransactionInformation(
@@ -36,7 +36,9 @@ def income_prediction(past: int, future: int, user_id):
     """ This takes the user ID, as every user has their own ID and 
     transaction. By inputting a user id, it filters out the transaction history
     and only display the transaction to its users."""
-    
+    if not array:
+        return JSONResponse(status_code=404, content={'message': "Transaction does not exist."})
+        
     def recursive_prediction(d_past, d_future ):
         df = pd.DataFrame(array)
         headers = ['transaction_date', 'Amount']
@@ -47,4 +49,4 @@ def income_prediction(past: int, future: int, user_id):
         forecasting = jsonable_encoder(prediction.predict(steps=d_future).to_dict())
         return forecasting
     
-    return recursive_prediction(past, future)
+    return JSONResponse(content=recursive_prediction(past, future))
