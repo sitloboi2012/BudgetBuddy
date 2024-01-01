@@ -42,6 +42,7 @@ def income_prediction(user_id:str):
             df = pd.DataFrame(array)
             headers = ['transaction_date', 'Amount']    
             df = df[headers]
+            df = df.groupby('transaction_date').sum().reset_index()
             df['transaction_date'] = pd.to_datetime(df['transaction_date'], dayfirst=True)
             past =(len(df['transaction_date'].unique())-1)
             """ Past will fetch all the history transaction date of the user,
