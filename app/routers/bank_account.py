@@ -223,12 +223,12 @@ def get_bank_account_info(
         {"account_name": account_name, "user_id": ObjectId(user_id)}
     )
 
-    bank_id = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
+    bank_name = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
 
     return GetAccountInformation(
         account_name=account_data["account_name"],
         account_type=account_type,
-        bank_name=bank_id,
+        bank_name=bank_name,
         current_balance=account_data["current_balance"],
     )
 
@@ -257,6 +257,26 @@ def get_all_account_data(user_id: str):
                         result.append([data["account_name"], data["current_balance"], key])
 
     return GetAllAccountName(list_account_name=result)
+
+@router.get(
+    "bank_account/{user_id}/{account_type}"
+)
+def get_all_account_type(
+    user_id: str,
+    account_type: str,
+):
+    account_type_model = MODEL[account_type]
+    list_account = account_type_model[1].find(
+        {"user_id": ObjectId(user_id)}
+    )
+    
+    result = []
+    for account in list_account:
+        bank_name = BANK_COLLECTION.find_one({"_id": account["bank_id"]})["bank_name"]
+        account_data = GetAccountInformation(**account, bank_name= bank_name).dict()
+        account_data["id"] = str(account["_id"])
+        result.append(account_data) 
+    return JSONResponse(status_code=200,content= result)
 
 @router.put("/{user_id}/{account_type}/{account_name}")
 def update_account_info(
