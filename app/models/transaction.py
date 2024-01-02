@@ -7,8 +7,9 @@ class Transaction(BaseModel):
     transaction_date : str = Field(...,alias="transaction_date")
     Payee : str = Field(alias="Payee", default=None)
     Amount : float = Field(...,alias="Amount")
-    bank_name : str = Field(...,alias="bank_name")
+    account_name : str = Field(...,alias="account_name")
     account_id: ObjectId = Field(alias="account_id", default=None)
+    account_type: str = Field(alias="account_type", default=None)
     user_id: ObjectId = Field(alias="user_id", default=None)
     transaction_type: str = Field(alias="transaction_type", default=None)
 
@@ -27,7 +28,8 @@ class GetTransactionInformation(BaseModel):
     transaction_date : str = Field(...,alias="transaction_date")
     Payee : str = Field(alias="Payee", default=None)
     Amount : float = Field(...,alias="Amount")
-    bank_name : str = Field(...,alias="bank_name")
+    account_name : str = Field(...,alias="account_name")
+    account_type: str = Field(alias="account_type", default=None)
     transaction_type: str = Field(alias="transaction_type", default=None)
     
     class Config:
@@ -37,3 +39,5 @@ class GetTransactionInformation(BaseModel):
             ObjectId: str
         }
 
+class MonthlyTransaction(BaseModel):
+    list_of_transactions: list[GetTransactionInformation] = Field(alias="list_of_transactions", default=None)

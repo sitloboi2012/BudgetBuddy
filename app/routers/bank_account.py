@@ -165,7 +165,7 @@ def create_account_manually(
 
 
 @router.get(
-    "/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
+    "/bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
 )
 def get_bank_account_info(
     user_id: str,
