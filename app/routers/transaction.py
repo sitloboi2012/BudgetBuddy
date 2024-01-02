@@ -1,21 +1,12 @@
-from pymongo import MongoClient
 import pandas as pd
-import os
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse
 from io import BytesIO
 from models.transaction import Transaction, GetTransactionInformation
 from bson import ObjectId 
-from constant import Constant
+from constant import TRANSACTION_COLLECTION, SAVING_COLLECTION, INVESTMENT_COLLECTION, EXPENSE_COLLECTION, EXPENSE_SPENDING_COLLECTION, GOAL_SETTINGS
 
 router = APIRouter(prefix="/api/v1", tags=["Import Transaction"])
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-db = client.get_collection("TRANSACTION_HISTORY")
-SAVING_COLLECTION = client.get_collection("SAVING_ACCOUNTS")
-INVESTMENT_COLLECTION = client.get_collection("INVESTMENT_ACCOUNTS")
-EXPENSE_COLLECTION = client.get_collection("EXPENSE_ACCOUNTS")
-PLAN_EXPENSE_COLLECTION = client.get_collection("EXPENSE_SPENDING")
-GOAL_SETTINGS = client.get_collection("GOAL_SETTINGS")
 
 MODEL = {
     "Saving": SAVING_COLLECTION,
@@ -24,9 +15,9 @@ MODEL = {
 }
 
 def update_expense_value_transaction(transaction_type, amount, user_id):
-    expense = PLAN_EXPENSE_COLLECTION.find_one({"user_id": ObjectId(user_id), "category": transaction_type})
+    expense = EXPENSE_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "category": transaction_type})
     if expense is not None:
-        PLAN_EXPENSE_COLLECTION.update_one(
+        EXPENSE_SPENDING_COLLECTION.update_one(
             {"user_id": ObjectId(user_id), "category": transaction_type},
             {"$set": {
                 "current_total_use": expense["current_total_use"] + amount
@@ -63,7 +54,7 @@ def post_transaction(user_id: str,
     account_id = account["_id"]
             
     # Check if the transaction already exists 
-    existing_transaction = db.find_one({
+    existing_transaction = TRANSACTION_COLLECTION.find_one({
         "transaction_name": transaction_name,
         "Payee": Payee,
         "transaction_date": transaction_date,
@@ -77,14 +68,14 @@ def post_transaction(user_id: str,
     if existing_transaction is not None:
         raise HTTPException(status_code=409, detail="Transaction already exists")
     
-    db.insert_one(
+    TRANSACTION_COLLECTION.insert_one(
         Transaction(transaction_name= transaction_name, Payee= Payee, transaction_date= transaction_date, Amount= Amount,
                     account_name= account_name, account_type= account_type,account_id=ObjectId(account_id), 
                     transaction_type= transaction_type, user_id= ObjectId(user_id)
                     ).dict()
     )
     
-    if transaction_type == "Income":
+    if transaction_type in ["Income","Investment"]:
         MODEL[account_type].update_one(
             {"user_id": ObjectId(user_id), "account_name": account_name},
             {"$inc": {"current_balance": Amount}}
@@ -118,7 +109,7 @@ def import_transaction(user_id: str,csv_file: UploadFile = File(...)):
             account_id = account["_id"]
             
             # Check if the transaction already exist 
-            existing_transaction = db.find_one({
+            existing_transaction = TRANSACTION_COLLECTION.find_one({
                 "transaction_name": value['transaction_name'],
                 "Payee": value['Payee'],
                "transaction_date":value["transaction_date"],
@@ -132,7 +123,7 @@ def import_transaction(user_id: str,csv_file: UploadFile = File(...)):
             if existing_transaction is not None:
                 return JSONResponse(status_code=409, content={"message": "Transaction already exists"})
             
-            db.insert_one(
+            TRANSACTION_COLLECTION.insert_one(
                 Transaction(transaction_name= value['transaction_name'],Payee= value['Payee'], transaction_date= value["transaction_date"], Amount= value["Amount"],
                             account_name= value["account_name"],account_type= value["account_type"],account_id=ObjectId(account_id), 
                             transaction_type= value["transaction_type"], user_id= ObjectId(user_id)
@@ -156,7 +147,7 @@ def import_transaction(user_id: str,csv_file: UploadFile = File(...)):
 
 @router.get("/transaction/{user_id}")
 def get_transaction(user_id: str):
-    list_transaction = db.find({"user_id": ObjectId(user_id)})
+    list_transaction = TRANSACTION_COLLECTION.find({"user_id": ObjectId(user_id)})
     array = [
            GetTransactionInformation(
                 transaction_id = str(value["_id"]),
@@ -181,7 +172,7 @@ def get_transaction(user_id: str):
 @router.delete("/transaction/{user_id}/{transaction_id}/delete")
 def delete_transaction(user_id: str, transaction_id: str):
     try:
-        transaction = db.find_one({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
+        transaction = TRANSACTION_COLLECTION.find_one({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
         Amount = -transaction["Amount"]
         if transaction["transaction_type"] == "Income":
             MODEL[transaction["account_type"]].update_one(
@@ -195,7 +186,7 @@ def delete_transaction(user_id: str, transaction_id: str):
             )
         update_expense_value_transaction(transaction["transaction_type"], Amount, user_id)
         # Delete the transaction
-        db.find_one_and_delete({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
+        TRANSACTION_COLLECTION.find_one_and_delete({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
 
         return JSONResponse(content={"message": "Transaction deleted successfully"})
     except Exception as e:

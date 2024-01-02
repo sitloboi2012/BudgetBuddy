@@ -3,17 +3,12 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Form
 from fastapi.responses import JSONResponse
 from bson import ObjectId
-from constant import Constant
-from pymongo import MongoClient
+from constant import PLANNING_SPENDING_COLLECTION, EXPENSE_SPENDING_COLLECTION
+
 
 from models.plan_spending import PlannedSpendingModel, PlannedSpendingModelView, MonthlyExpensePlan, MonthlyExpensePlanModelView
 
 router = APIRouter(prefix="/api/v1", tags=["Plan Settings"])
-
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-PLANNING_SPENDING_COLLECTION = CLIENT.get_collection("PLANNING_SPENDING")
-EXPENSE_SPENDING_COLLECTION = CLIENT.get_collection("EXPENSE_SPENDING")
-
 
 @router.post("/plan_spending/{user_id}/create")
 def create_spending(
