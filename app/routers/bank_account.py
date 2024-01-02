@@ -190,7 +190,7 @@ def bank_account_import(user_id: str, csv_file: UploadFile = File(...)):
     return JSONResponse( content= data)
 
 @router.get(
-    "bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
+    "/bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
 )
 def get_bank_account_info(
     user_id: str,
