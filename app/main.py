@@ -11,8 +11,8 @@ from routers import (
     register, newsletter,
     bank_account, bank_info,
     profile, login, goal,
-    transaction, bank_account_import,
-    user_bills, plan_spending, investment_api, report_api)
+    transaction, user_bills, 
+    plan_spending, investment_api, report_api)
 
 
 app = FastAPI(
@@ -37,7 +37,6 @@ app.include_router(login.router)
 app.include_router(profile.router)
 app.include_router(goal.router)
 app.include_router(transaction.router)
-app.include_router(bank_account_import.router)
 app.include_router(user_bills.router)
 app.include_router(report_api.router)
 if __name__ == "__main__":

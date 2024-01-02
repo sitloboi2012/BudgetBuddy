@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, File, UploadFile
+import pandas as pd
+from io import BytesIO
 from fastapi.responses import JSONResponse
 from constant import Constant
 from pymongo import MongoClient
@@ -77,7 +79,7 @@ def verify_account_info(
     """
     if (
         account_type_model[1].find_one(
-            {"account_name": account_name, "bank_id": bank_id}
+            {"account_name": account_name, "bank_id": bank_id,  "user_id": user_id},
         )
         is None
     ):
@@ -163,6 +165,36 @@ def create_account_manually(
             status_code=422, content={"message": "Bank account already exists"}
         )
 
+@router.post('/bank_account/{user_id}/bank_account_import')
+def bank_account_import(user_id: str, csv_file: UploadFile = File(...)):
+    headers = ["account_name", "account_type", "current_balance", "bank_name"]
+    df = pd.read_csv(BytesIO(csv_file.file.read()), names=headers, skiprows= 1)
+    data = df.to_dict(orient='records')
+    for value in data:
+        if value["account_type"] not in MODEL:
+            return JSONResponse(
+            status_code=422, content={"message": f"Invalid account type:{value}"}
+        )
+        bank = BANK_COLLECTION.find_one({"bank_name": value["bank_name"]})
+        if bank is None:
+            return JSONResponse(status_code=422, content={ "message": f"Invalid bank name: {value}"})
+        bank_id = bank["_id"]
+        account = ACCOUNT_COLLECTION.find_one({"bank_id": ObjectId(bank_id), "user_id": ObjectId(user_id)})
+        if account is None:
+            account_id = create_new_account_generic(user_id=user_id, bank_id=bank_id)
+        else:
+            account_id = account["_id"]
+        created_account = verify_account_info(
+            account_name=value["account_name"],
+            account_type_model=MODEL[value["account_type"]],
+            account_id=ObjectId(account_id),
+            user_id=ObjectId(user_id),
+            bank_id=ObjectId(bank_id),
+            current_balance= value["current_balance"],
+        )
+        if created_account == False:
+            return JSONResponse(status_code=422, content={"message": "Bank account already exists"})
+    return JSONResponse( content= data)
 
 @router.get(
     "/bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
@@ -191,12 +223,12 @@ def get_bank_account_info(
         {"account_name": account_name, "user_id": ObjectId(user_id)}
     )
 
-    bank_id = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
+    bank_name = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
 
     return GetAccountInformation(
         account_name=account_data["account_name"],
         account_type=account_type,
-        bank_name=bank_id,
+        bank_name=bank_name,
         current_balance=account_data["current_balance"],
     )
 
@@ -214,15 +246,37 @@ def get_all_account_data(user_id: str):
     Raises:
         None.
     """
-    account_id = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id)})["_id"]
+    list_account_id = [account["_id"] for account in ACCOUNT_COLLECTION.find({"user_id": ObjectId(user_id)})]
 
     result = []
     for key, value in MODEL.items():
-        data = value[1].find_one({"account_id": ObjectId(account_id)})
-        if data is not None:
-            result.append([data["account_name"], data["current_balance"]])
+            for account_id in list_account_id:
+                list_data = value[1].find({"account_id": ObjectId(account_id)})
+                if list_data:
+                    for data in list_data:
+                        result.append([data["account_name"], data["current_balance"], key])
 
     return GetAllAccountName(list_account_name=result)
+
+@router.get(
+    "bank_account/{user_id}/{account_type}"
+)
+def get_all_account_type(
+    user_id: str,
+    account_type: str,
+):
+    account_type_model = MODEL[account_type]
+    list_account = account_type_model[1].find(
+        {"user_id": ObjectId(user_id)}
+    )
+    
+    result = []
+    for account in list_account:
+        bank_name = BANK_COLLECTION.find_one({"_id": account["bank_id"]})["bank_name"]
+        account_data = GetAccountInformation(**account, bank_name= bank_name).dict()
+        account_data["id"] = str(account["_id"])
+        result.append(account_data) 
+    return JSONResponse(status_code=200,content= result)
 
 @router.put("/{user_id}/{account_type}/{account_name}")
 def update_account_info(
