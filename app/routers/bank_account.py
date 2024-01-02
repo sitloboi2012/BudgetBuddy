@@ -4,7 +4,7 @@ from fastapi import APIRouter, Form, File, UploadFile
 import pandas as pd
 from io import BytesIO
 from fastapi.responses import JSONResponse
-from constant import Constant
+from constant import BANK_COLLECTION, ACCOUNT_COLLECTION, SAVING_COLLECTION, INVESTMENT_COLLECTION, EXPENSE_COLLECTION
 from pymongo import MongoClient
 from models.bank_account import (
     SavingOrInvestmentAccount,
@@ -18,13 +18,6 @@ from bson import ObjectId
 
 router = APIRouter(prefix="/api/v1", tags=["CRUD Bank Account"])
 
-# MONGODB CONNECTION
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-BANK_COLLECTION = CLIENT.get_collection("BANK_INFO")
-ACCOUNT_COLLECTION = CLIENT.get_collection("ACCOUNTS")
-SAVING_COLLECTION = CLIENT.get_collection("SAVING_ACCOUNTS")
-INVESTMENT_COLLECTION = CLIENT.get_collection("INVESTMENT_ACCOUNTS")
-EXPENSE_COLLECTION = CLIENT.get_collection("EXPENSE_ACCOUNTS")
 
 # MODEL INITIALIZATION
 MODEL = {
