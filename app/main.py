@@ -9,9 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routers import (
     register, newsletter,
-    bank_account, bank_info,
+    bank_account,
     profile, login, goal,
-    transaction, bank_account_import,
+    transaction,
     user_bills, plan_spending, investment_api, report_api, prediction)
 
 

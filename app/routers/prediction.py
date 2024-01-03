@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pymongo import MongoClient
 from sklearn.linear_model import LinearRegression
-from constant import Constant
+from constant import Constant, TRANSACTION_COLLECTION
 import pandas as pd
 from models.transaction import GetTransactionInformation
 from pymongo import MongoClient
@@ -13,14 +13,12 @@ from skforecast.ForecasterAutoreg import ForecasterAutoreg
 
 # Connect to DB
 router = APIRouter(prefix="/api/v1", tags=["Income Prediction"])
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-db = client.get_collection("TRANSACTION_HISTORY")
 
 #Get route of prediction
 @router.get('/prediction/{user_id}')
 def income_prediction(user_id:str):
     #Check to see if user ID exist
-    list_transaction = db.find({"user_id": ObjectId(user_id)})
+    list_transaction = TRANSACTION_COLLECTION.find({"user_id": ObjectId(user_id)})
     array = [
            GetTransactionInformation(
                 transaction_id = str(value["_id"]),
