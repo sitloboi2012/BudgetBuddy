@@ -21,7 +21,7 @@ def login(user_name: str = Form(..., description="Username of the user"),
         # Compare the entered password with the stored hashed password
         if bcrypt.checkpw(password.encode('utf-8'), account['password'].encode('utf-8')):
             if key == account['key']:
-                return JSONResponse(content={"user_name": user_name})
+                return JSONResponse(content={"user_name": user_name, "user_id": str(account["_id"])})
             else:
                 return JSONResponse(status_code=401, content={'message': "Key is incorrect."})
         else:

@@ -38,10 +38,13 @@ def create_spending(
 
 @router.get("/plan_spending/{user_id}/{timeframe}")
 def get_all_spending(user_id: str, timeframe: str):
-    spending = PLANNING_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id), "time_duration": timeframe})
-    return JSONResponse(
-        status_code=200,
-        content=[PlannedSpendingModelView(**spending).dict() for spending in spending])
+    spendings = PLANNING_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id), "time_duration": timeframe})
+    list_speding = []
+    for spending in spendings:
+        spending_dict = PlannedSpendingModelView(**spending).dict()
+        spending_dict["id"] = str(spending["_id"])
+        list_speding.append(spending_dict) 
+    return JSONResponse(status_code=200,content= list_speding)
 
 @router.put("/plan_spending/{user_id}/{spending_id}")
 def update_spending(
@@ -82,6 +85,7 @@ def create_monthly_expense_plan(
     user_id: str,
     category: str = Form(..., description="Category of the spending"),
     initial_amount: int | float = Form(..., description="Initial amount of the spending"),
+    time_duration: str = Form(..., description="Time Duration for Expense Planning. For example: Jan 2024, Feb 2023, etc.")
 ):
     if EXPENSE_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "category": category}) is not None:
         raise HTTPException(status_code=400, detail="Spending name already exist")
@@ -91,6 +95,7 @@ def create_monthly_expense_plan(
         category=category,
         initial_amount=initial_amount,
         current_total_use=0,
+        time_duration = time_duration
     ).dict()
     EXPENSE_SPENDING_COLLECTION.insert_one(spending)
     return JSONResponse(status_code=200, content={"message": "Spending created successfully"})
