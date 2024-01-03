@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pymongo import MongoClient
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from constant import Constant
 import pandas as pd
 from models.transaction import GetTransactionInformation
@@ -39,19 +39,40 @@ def income_prediction(user_id:str):
     
     #Fetch history transaction to predict 
     def recursive_prediction(d_future):
-            df = pd.DataFrame(array)
-            headers = ['transaction_date', 'Amount']    
-            df = df[headers]
-            df = df.groupby('transaction_date').sum().reset_index()
-            df['transaction_date'] = pd.to_datetime(df['transaction_date'], dayfirst=True)
-            past =(len(df['transaction_date'].unique())-1)
+            def datas():
+                df = pd.DataFrame(array)
+                headers = ['transaction_date', 'Amount']    
+                df = df[headers]    
+                df = df.groupby('transaction_date').sum().reset_index()
+                df['transaction_date'] = pd.to_datetime(df['transaction_date'], dayfirst=True)
+                df = df.set_index('transaction_date')
+                df = df.sort_index()
+                return df
             """ Past will fetch all the history transaction date of the user,
             combined, all the dates that has the same day, into one. We then use that data to make prediction
             for the upcoming 6 months."""
-            prediction = ForecasterAutoreg(regressor = RandomForestRegressor(), lags = past)
-            prediction.fit(y = df['Amount'])
-            forecasting = jsonable_encoder(prediction.predict(steps=d_future).to_dict())
-            return forecasting
-        
-    #Predict the next 6 months of income = 180 days.
-    return JSONResponse(content=recursive_prediction(180))
+            
+            
+            df = datas()
+            def loop():
+                data_input = []
+                data_input.append(df['Amount'].tolist())
+                data_input = sum(data_input, [])
+                forecast = ForecasterAutoreg(regressor=LinearRegression(), lags=2)
+                
+                """ The prediction work recursively as in, it will make a prediction for one day ahead, after that 
+                we will append that prediction and used that new prediction for the next prediction. We will repeat 
+                the steps as how much we want, in this case we did it recuresively for 180 which is equivalant to 6 months"""
+                for time in range(1,d_future,1):
+                    forecast.fit(y = pd.Series(data_input))
+                    predictions = forecast.predict(steps = 1)
+                    predictions = round(predictions, 0)
+                    predictions = predictions.tolist()
+                    data_input = data_input + predictions
+                data_input = data_input[5:]    
+                """ This removes the alread exited transaction history, and will only return the predicted transaction """
+                return data_input
+                
+            return loop()
+    #This will predicts for the next upcoming 3 months    
+    return JSONResponse(content=recursive_prediction(90))
