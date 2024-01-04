@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-#from enum import StrEnum
+##from enum import StrEnum
 from pydantic import BaseModel
 
 import os

@@ -14,9 +14,10 @@ from models.bank_account import (
     GetAccountInformation,
 )
 from bson import ObjectId
+import certifi as certifi
 
 # MONGODB CONNECTION
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+CLIENT = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
 BANK_COLLECTION = CLIENT.get_collection("BANK_INFO")
 ACCOUNT_COLLECTION = CLIENT.get_collection("ACCOUNTS")
 SAVING_COLLECTION = CLIENT.get_collection("SAVING_ACCOUNTS")

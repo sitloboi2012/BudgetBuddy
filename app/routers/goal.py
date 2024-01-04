@@ -9,9 +9,10 @@ from bson import ObjectId
 from datetime import datetime
 from typing import Optional
 from models.goal import GoalSettingBaseModel, GoalModelView
+import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["Goal Setting"])
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+client = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
 GOAL_SETTING_BASE = client.get_collection("GOAL_SETTINGS")
 
 
@@ -126,9 +127,14 @@ def get_all_goal_view(
         JSONResponse: A JSON response containing the goals as a list of dictionaries.
     """
     goals = GOAL_SETTING_BASE.find({"user_id": ObjectId(user_id)})
+    goal_list = []
+    for goal in goals:
+        goal_data = GoalModelView(**goal).dict()
+        goal_data["connected_account_name"]= goal["connected_account_name"]
+        goal_list.append(goal_data)
     return JSONResponse(
         status_code=200,
-        content=[GoalModelView(**goal).dict() for goal in goals]
+        content=goal_list
     )
 
 @router.put("/goal_saving_setting/{user_id}/{goal_id}/update")

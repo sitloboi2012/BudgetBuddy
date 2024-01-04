@@ -13,11 +13,12 @@ from models.bank_account import (
     GetAllAccountName,
 )
 from bson import ObjectId
+import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["CRUD Bank Account"])
 
 # MONGODB CONNECTION
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+CLIENT = MongoClient(host=Constant.MONGODB_URI, tlsCAFile=certifi.where(), tls=True).get_database("dev")
 BANK_COLLECTION = CLIENT.get_collection("BANK_INFO")
 ACCOUNT_COLLECTION = CLIENT.get_collection("ACCOUNTS")
 SAVING_COLLECTION = CLIENT.get_collection("SAVING_ACCOUNTS")
@@ -214,13 +215,16 @@ def get_all_account_data(user_id: str):
     Raises:
         None.
     """
-    account_id = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id)})["_id"]
+    list_account_id = [account["_id"] for account in ACCOUNT_COLLECTION.find({"user_id": ObjectId(user_id)})]
 
     result = []
     for key, value in MODEL.items():
-        data = value[1].find_one({"account_id": ObjectId(account_id)})
-        if data is not None:
-            result.append([data["account_name"], data["current_balance"]])
+            for account_id in list_account_id:
+                list_data = value[1].find({"account_id": ObjectId(account_id)})
+                if list_data:
+                    for data in list_data:
+                        result.append([data["account_name"], data["current_balance"], 
+                                       str(ObjectId(data["account_id"])),str(ObjectId(data["bank_id"])), key])
 
     return GetAllAccountName(list_account_name=result)
 

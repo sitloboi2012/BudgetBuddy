@@ -27,7 +27,8 @@ class MonthlyExpensePlan(BaseModel):
     category: str = Field(..., description = "Category of the spending")
     initial_amount: int | float = Field(..., description = "Initial amount of the spending")
     current_total_use: int | float = Field(..., description = "Current total use of the spending")
-    
+    time_duration: str = Field(..., description = "Time Duration for Expense Planning. For example: Jan 2024, Feb 2023, etc.")
+
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed = True
@@ -37,3 +38,4 @@ class MonthlyExpensePlanModelView(BaseModel):
     category: str = Field(..., description = "Category of the spending")
     initial_amount: int | float = Field(..., description = "Initial amount of the spending")
     current_total_use: int | float = Field(..., description = "Current total use of the spending")
+    time_duration: str = Field(..., description = "Time Duration for Expense Planning. For example: Jan 2024, Feb 2023, etc.")

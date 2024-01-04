@@ -7,11 +7,12 @@ from bson import ObjectId
 import bcrypt
 import uuid
 from fastapi.encoders import jsonable_encoder
+import certifi as certifi
 
 
 from models.email import EmailSchema, send_email  
 router = APIRouter(prefix="/api/v1", tags=["User Profile"])
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+client = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
 db = client.get_collection("USERS")
 
 @router.get('/profile/{id}', responses= {404: {"model": Message},

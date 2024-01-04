@@ -1,10 +1,15 @@
 // main.ts
-import './style.css';
+import './try.css';
+import './assets/tailwind.css';
 import { createApp } from 'vue';
 import App from './App.vue';
 import axios from 'axios';
+import { setupCalendar } from 'v-calendar';
+import VueApexCharts from 'vue3-apexcharts';
+import { MonthPicker } from 'vue-month-picker';
+import { MonthPickerInput } from 'vue-month-picker';
 
-import router from './router/router.ts';
+import router from './router/router';
 // Import the 'cors' middleware
 
 
@@ -28,5 +33,9 @@ const axiosInstance = axios.create({
 // Make Axios available globally in the app
 app.config.globalProperties.$axios = axiosInstance;
 
+app.use(MonthPicker)
+app.use(MonthPickerInput)
+app.use(VueApexCharts);
+app.use(setupCalendar, {})
 app.use(router);
 app.mount('#app');
