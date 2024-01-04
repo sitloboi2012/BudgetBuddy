@@ -39,3 +39,10 @@ class MonthlyExpensePlanModelView(BaseModel):
     initial_amount: int | float = Field(..., description = "Initial amount of the spending")
     current_total_use: int | float = Field(..., description = "Current total use of the spending")
     time_duration: str = Field(..., description = "Time Duration for Expense Planning. For example: Jan 2024, Feb 2023, etc.")
+
+
+class TransactionModelView(BaseModel):
+    transaction_name: str = Field(..., description = "Name of the transaction")
+    transaction_date: str = Field(..., description = "Date of the transaction")
+    Amount: float = Field(..., description = "Amount of the transaction")
+   

@@ -3,10 +3,10 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Form
 from fastapi.responses import JSONResponse
 from bson import ObjectId
-from constant import PLANNING_SPENDING_COLLECTION, EXPENSE_SPENDING_COLLECTION
+from constant import PLANNING_SPENDING_COLLECTION, EXPENSE_SPENDING_COLLECTION, TRANSACTION_COLLECTION
+from datetime import datetime
 
-
-from models.plan_spending import PlannedSpendingModel, PlannedSpendingModelView, MonthlyExpensePlan, MonthlyExpensePlanModelView
+from models.plan_spending import PlannedSpendingModel, PlannedSpendingModelView, MonthlyExpensePlan, MonthlyExpensePlanModelView, TransactionModelView
 
 router = APIRouter(prefix="/api/v1", tags=["Plan Settings"])
 
@@ -97,10 +97,20 @@ def create_monthly_expense_plan(
 
 @router.get("/monthly_expense_plan/{user_id}")
 def get_all_monthly_expense_plan(user_id: str):
-    spending = EXPENSE_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id)})
+    spendings = EXPENSE_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id)})
+    list_speding = []
+    for spending in spendings:
+        spending_dict = MonthlyExpensePlanModelView(**spending).dict()
+        spending_dict["id"] = str(spending["_id"])
+        parsed_date = datetime.strptime(spending["time_duration"], "%b %Y")
+        formatted_date = parsed_date.strftime("%Y-%m")
+        list_transaction = TRANSACTION_COLLECTION.find({"user_id": ObjectId(user_id), "category": spending["category"]})
+        list_transaction_by_date = [TransactionModelView(**transaction).dict() for transaction in list_transaction if formatted_date in transaction["transaction_date"]]
+        spending_dict["list_transaction"] = list_transaction_by_date
+        list_speding.append(spending_dict) 
     return JSONResponse(
         status_code=200,
-        content=[MonthlyExpensePlanModelView(**spending).dict() for spending in spending])
+        content= list_speding)
     
 @router.delete("/monthly_expense_plan/{user_id}/{spending_id}")
 def delete_monthly_expense_plan(user_id: str, spending_id: str):
