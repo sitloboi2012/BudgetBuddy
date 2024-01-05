@@ -176,9 +176,9 @@ def get_transaction(user_id: str):
     return JSONResponse(content=array)
 
 
-@router.get("/transaction/{user_id}/{month}")
+@router.get("/transaction/{user_id}/{year_month}")
 def get_transaction_by_month(user_id: str,
-                    month: str ,
+                    year_month: str ,
                     ):
     
     list_transaction = TRANSACTION_COLLECTION.find({"user_id": ObjectId(user_id)})
@@ -194,7 +194,7 @@ def get_transaction_by_month(user_id: str,
                 transaction_type=value["transaction_type"],
                 category= value["category"],
             ).dict()
-            for value in list_transaction if month == value["transaction_date"].split('-')[1] 
+            for value in list_transaction if year_month == '-'.join(value["transaction_date"].split('-')[:2])
         ]
     if not array:
         return JSONResponse(status_code=404, content={'message': "Transaction does not exist."})
