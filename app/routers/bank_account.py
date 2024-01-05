@@ -247,8 +247,9 @@ def get_all_account_data(user_id: str):
                 list_data = value[1].find({"account_id": ObjectId(account_id)})
                 if list_data:
                     for data in list_data:
+                        bank_name = BANK_COLLECTION.find_one({"_id": ObjectId(data["bank_id"])})["bank_name"]
                         result.append([data["account_name"], data["current_balance"], 
-                                       str(ObjectId(data["account_id"])),str(ObjectId(data["bank_id"])), key])
+                                       str(ObjectId(data["account_id"])),bank_name, key])
 
     return GetAllAccountName(list_account_name=result)
 
