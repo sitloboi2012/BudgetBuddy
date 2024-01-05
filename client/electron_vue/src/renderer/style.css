@@ -13,11 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
-@media screen and (min-width: 1000px){
+@media screen and (min-width: 1000px) {
   .homebar {
     top: 10px;
     left: 350px;
-    position:absolute;
+    position: absolute;
   }
   .homebar ul {
     display: flex;
@@ -30,7 +30,7 @@
 a {
   padding-left: 20px;
   font-weight: 500;
-  color: #7073B2;
+  color: #7073b2;
   text-decoration: inherit;
 }
 
@@ -43,7 +43,7 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-  background-image: linear-gradient(to bottom right, #2B308E, #000000);
+  background-image: linear-gradient(to bottom right, #2b308e, #000000);
 }
 
 h1 {
@@ -68,41 +68,41 @@ h1 {
   }
 }
 .networth {
-position: absolute;
-left: 50px;
-top: 60px;
+  position: absolute;
+  left: 40px;
+  top: 80px;
 }
-.label{
+.label {
   display: inline;
 }
-.total p{
-  color: #7073B2;
-  padding-right: 140px;
+.total p {
+  color: #7073b2;
 }
-.total h2{
+.total h2 {
   color: rgb(255, 255, 255);
 }
-.networth_container{
+.networth_container {
   margin-top: 10px;
   padding: 4px;
   background-color: #7981d030;
   border-radius: 15px;
   height: 600px;
+  width: max-content;
 }
-.bank_acc{
+.bank_acc {
   color: white;
   margin: 15px;
-  display:block;
+  display: block;
   font-size: 14px;
 }
 .bank_acc p {
-  color:#ffffff;
+  color: #ffffff;
   font-weight: 700;
   margin: 7px;
 }
 
-button{
-  background-color: #6A56E7;
+button {
+  background-color: #6a56e7;
   width: 240px;
   border: none;
   border-radius: 20px;
@@ -110,7 +110,7 @@ button{
   display: flex;
   justify-content: space-between;
 }
-.add{
+.add {
   color: white;
   position: absolute;
   bottom: 18px;
@@ -120,7 +120,7 @@ button{
   justify-content: center;
 }
 
-.screen{
+.screen {
   background-color: #ffffff14;
   position: absolute;
   left: 372px;
@@ -129,8 +129,8 @@ button{
   height: 86%;
   border-radius: 20px;
 }
-@media screen and (min-width: 1400px){
-  .screen{
+@media screen and (min-width: 1400px) {
+  .screen {
     width: 70%;
   }
 }

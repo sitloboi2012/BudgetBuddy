@@ -5,9 +5,10 @@ from models.users import UserInfo
 from constant import Message, Constant
 from pymongo import MongoClient
 import bcrypt
-from models.email import EmailSchema, send_email         
+from models.email import EmailSchema, send_email    
+import certifi as certifi     
 router = APIRouter(prefix="/api/v1", tags=["User Register"])
-client = MongoClient(host= Constant.MONGODB_URI ).get_database("dev")
+client = MongoClient(host= Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True ).get_database("dev")
 db = client.get_collection("USERS")
 
 

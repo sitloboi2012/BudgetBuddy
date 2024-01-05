@@ -13,11 +13,11 @@ from models.bank_account import (
     GetAllAccountName,
 )
 from bson import ObjectId
-
+import certifi as certifi
 router = APIRouter(prefix="/api/v1", tags=["CRUD Bank Account"])
 
 # MONGODB CONNECTION
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+CLIENT = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
 BANK_COLLECTION = CLIENT.get_collection("BANK_INFO")
 ACCOUNT_COLLECTION = CLIENT.get_collection("ACCOUNTS")
 SAVING_COLLECTION = CLIENT.get_collection("SAVING_ACCOUNTS")
@@ -191,12 +191,12 @@ def get_bank_account_info(
         {"account_name": account_name, "user_id": ObjectId(user_id)}
     )
 
-    bank_id = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
+    bank_name = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
 
     return GetAccountInformation(
         account_name=account_data["account_name"],
         account_type=account_type,
-        bank_name=bank_id,
+        bank_name=bank_name,
         current_balance=account_data["current_balance"],
     )
 
@@ -214,69 +214,34 @@ def get_all_account_data(user_id: str):
     Raises:
         None.
     """
-    account_id = ACCOUNT_COLLECTION.find_one({"user_id": ObjectId(user_id)})["_id"]
+    list_account_id = [account["_id"] for account in ACCOUNT_COLLECTION.find({"user_id": ObjectId(user_id)})]
 
     result = []
     for key, value in MODEL.items():
-        data = value[1].find_one({"account_id": ObjectId(account_id)})
-        if data is not None:
-            result.append([data["account_name"], data["current_balance"]])
+            for account_id in list_account_id:
+                list_data = value[1].find({"account_id": ObjectId(account_id)})
+                if list_data:
+                    for data in list_data:
+                        result.append([data["account_name"], data["current_balance"], key])
 
     return GetAllAccountName(list_account_name=result)
 
-@router.put("/{user_id}/{account_type}/{account_name}")
-def update_account_info(
-    user_id: str, account_type: str, account_name: str, new_value: dict[str, str]
-):
-    """
-    Update the information of a bank account.
-
-    Args:
-        user_id (str): The ID of the user.
-        account_type (str): The type of the account.
-        account_name (str): The name of the account.
-        new_value (dict[str, str]): The new values to update the account with.
-
-    Returns:
-        JSONResponse: The response indicating the success of the update.
-    """
-    account_type_model = MODEL[account_type]
-
-    if "account_name" in new_value:
-        account_type_model[1].update_one(
-            {"account_name": account_name, "user_id": ObjectId(user_id)},
-            {"$set": {"account_name": new_value["account_name"]}},
-        )
-
-    return JSONResponse(
-        status_code=200, content={"message": "Bank account updated successfully"}
-    )
-
-
-@router.delete("/{user_id}/{account_type}/{account_name}")
-def delete_account(
+@router.get(
+    "/bank_account/{user_id}/{account_type}"
+)
+def get_all_account_type(
     user_id: str,
     account_type: str,
-    account_name: str,
 ):
-    """
-    Delete a bank account for a specific user.
-
-    Args:
-        user_id (str): The ID of the user.
-        account_type (str): The type of the account.
-        account_name (str): The name of the account.
-
-    Returns:
-        JSONResponse: The response indicating the success of the deletion.
-    """
     account_type_model = MODEL[account_type]
-    account_type_model[1].delete_one(
-        {"account_name": account_name, "user_id": ObjectId(user_id)}
+    list_account = account_type_model[1].find(
+        {"user_id": ObjectId(user_id)}
     )
-    ACCOUNT_COLLECTION.update_one(
-        {"user_id": ObjectId(user_id)}, {"$inc": {"number_of_account": -1}}
-    )
-    return JSONResponse(
-        status_code=200, content={"message": "Bank account deleted successfully"}
-    )
+    
+    result = []
+    for account in list_account:
+        bank_name = BANK_COLLECTION.find_one({"_id": account["bank_id"]})["bank_name"]
+        account_data = GetAccountInformation(**account, bank_name= bank_name).dict()
+        account_data["id"] = str(account["_id"])
+        result.append(account_data) 
+    return JSONResponse(status_code=200,content= result)
