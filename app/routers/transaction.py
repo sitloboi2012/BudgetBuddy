@@ -168,6 +168,7 @@ def get_transaction(user_id: str):
                 account_name=value["account_name"],
                 account_type=value["account_type"],
                 transaction_type=value["transaction_type"],
+                 category= value["category"],
             ).dict()
             for value in list_transaction
         ]
