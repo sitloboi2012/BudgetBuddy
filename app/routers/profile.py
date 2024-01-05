@@ -33,7 +33,7 @@ def profile(id: str):
         return  JSONResponse(status_code=401, content={"message": "Unauthorized"})
 
 
-@router.put('/profile/{id}', responses= {404: {"model": Message},
+@router.put('/profile/{id}/update', responses= {404: {"model": Message},
                                                 422: {"model": Message}})
 def update( background_tasks: BackgroundTasks,
             id:str,
