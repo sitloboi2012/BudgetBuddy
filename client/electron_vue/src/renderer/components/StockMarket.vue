@@ -1,17 +1,32 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const stocks = ref([]);
 
-onMounted(async () => {
+const fetchStockData = async () => {
   try {
     const response = await axios.get('http://localhost:8080/api/v1/get_all_stocks');
     stocks.value = response.data.list_of_stocks;
+    console.log(stocks.value);
+    
   } catch (error) {
     console.error('Error fetching stock data:', error);
   }
-});
+};
+
+onMounted(fetchStockData);
+
+const filterUpTrendStock = () => {
+  fetchStockData();
+  stocks.value = stocks.value.filter(stock => stock.price_diff > 0);
+};
+
+const filterDownTrendStock = () => {
+ fetchStockData();
+
+  stocks.value = stocks.value.filter(stock => stock.price_diff < 0);
+};
 </script>
 
 <template>
@@ -25,19 +40,19 @@ onMounted(async () => {
    <a href="#" class="inline-block rounded-full text-indigo-700
                           bg-gray-100
                           text-xs font-bold 
-                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 ">
+                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 " >
                          Hot
                       </a>
        <a href="#" class="inline-block rounded-full text-black
                           
                           text-xs 
-                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 ">
+                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 " @click="filterUpTrendStock()">
                           Upside
                       </a>
        <a href="#" class="inline-block rounded-full text-black
                           
                           text-xs 
-                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 ">
+                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 " @click="filterDownTrendStock()">
                           Downside
                       </a>
   </header>
@@ -54,15 +69,12 @@ onMounted(async () => {
       </div>
     </div>
     <div class="flex flex-col justify-items-end w-full">
-      <div class="text-blue-500 text-sm font-medium w-full text-right" v-if="stock.previous_close < stock.current_price">
-        ${{ stock.current_price }}
-      </div>
+      <div class="text-black text-sm font-medium w-full text-right">
+        $ {{ stock.current_price }}</div>
       <div class="text-blue-500 text-sm font-medium w-full text-right" v-if="stock.previous_close < stock.current_price">
         ↑ {{ stock.price_diff }}%
       </div>
-      <div class="text-red-500 text-sm font-medium w-full text-right" v-else>
-        ${{ stock.current_price }}
-      </div>
+     
       <div class="text-red-500 text-sm font-medium w-full text-right" v-else>
         ↓ {{ stock.price_diff }}%
       </div>
