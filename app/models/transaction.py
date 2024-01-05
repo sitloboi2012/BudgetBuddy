@@ -33,6 +33,7 @@ class GetTransactionInformation(BaseModel):
     account_type: str = Field(alias="account_type", default=None)
     transaction_type: str = Field(alias="transaction_type", default=None)
     category: str = Field(alias="category", default=None)
+    
     class Config:
         allow_population_by_field_name = True
         arbitrary_types_allowed=True

@@ -1,5 +1,4 @@
 import pandas as pd
-import certifi as certifi
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from fastapi.responses import JSONResponse
 from io import BytesIO
@@ -225,28 +224,3 @@ def delete_transaction(user_id: str, transaction_id: str):
         return JSONResponse(content={"message": "Transaction deleted successfully"})
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
-
-@router.get("/transaction/{user_id}/{year_month}")
-def get_transaction_by_month(user_id: str,
-                    year_month: str ,
-                    ):
-    
-    list_transaction = db.find({"user_id": ObjectId(user_id)})
-    array = [
-           GetTransactionInformation(
-                transaction_id = str(value["_id"]),
-                transaction_name=value["transaction_name"],
-                transaction_date=value["transaction_date"],
-                Payee=value["Payee"],
-                Amount=value["Amount"],
-                account_name=value["account_name"],
-                account_type=value["account_type"],
-                transaction_type=value["transaction_type"],
-                category= value["category"],
-            ).dict()
-            for value in list_transaction if year_month == '-'.join(value["transaction_date"].split('-')[:2])
-        ]
-    if not array:
-        return JSONResponse(status_code=404, content={'message': "Transaction does not exist."})
-        
-    return JSONResponse(content=array)

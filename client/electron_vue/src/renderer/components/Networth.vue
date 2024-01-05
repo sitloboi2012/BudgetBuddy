@@ -29,7 +29,7 @@
 import { ref, defineEmits, onMounted, computed } from 'vue';
 import axios from 'axios';
 
-const user_id = '657deedb53a90ee98e224654';
+const user_id = localStorage.getItem('userId') ?? '';
 const userAccounts = ref([]);
 const selectedAccountTypes = ref([]);
 
@@ -37,6 +37,7 @@ const fetchBankAccount = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/api/v1/${user_id}`);
     userAccounts.value = response.data.list_account_name;
+    console.log(response.data)
   } catch (error) {
     console.error('Error fetching account information:', error);
   }
@@ -53,7 +54,7 @@ const addAccount = () => {
 };
 
 const uniqueAccountTypes = computed(() => {
-  return Array.from(new Set(userAccounts.value.map(account => account[2])));
+  return Array.from(new Set(userAccounts.value.map(account => account[4])));
 });
 
 const getSumOfAccount = (accountType) => {
@@ -64,7 +65,7 @@ const getSumOfAccount = (accountType) => {
 };
 
 const getAccountsByType = (accountType: any) => {
-  return userAccounts.value.filter(account => account[2] === accountType);
+  return userAccounts.value.filter(account => account[4] === accountType);
 };
 
 const totalNetworth = computed(() => {

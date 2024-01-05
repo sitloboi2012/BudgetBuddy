@@ -1,5 +1,6 @@
 import type { ColumnDef } from '@tanstack/vue-table'
-
+import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
+import { Button } from '../../../@/components/ui/button'
 import DropdownAction from './DataTableDropDown.vue'
 import { h } from 'vue'
 // This type is used to define the shape of our data.
@@ -35,7 +36,13 @@ export const columns: ColumnDef<Payment>[] = [
     
       {
         accessorKey: 'date',
-        header: 'Date',
+        header: ({ column }) => {
+          return h(Button, {
+              variant: 'ghost',
+              onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+              class: 'flex items-center w-max',
+          }, () => ['Date', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      },
       },
       {
         accessorKey: 'payee',
@@ -52,7 +59,15 @@ export const columns: ColumnDef<Payment>[] = [
    
     {
         accessorKey: "amount",
-        header: () => h('div', { class: 'text-right' }, 'Amount'),
+        header: ({ column }) => {
+          return h(Button, {
+              variant: 'ghost',
+              onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+              class: 'flex items-center w-max',
+          }, () => ['Amount', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      },
+      
+
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue("amount"))
             const formatted = new Intl.NumberFormat("en-US", {
@@ -62,6 +77,7 @@ export const columns: ColumnDef<Payment>[] = [
 
             return h('div', { class: 'text-right font-medium' }, formatted)
         },
+
     },
     {
         id: 'actions',

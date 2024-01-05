@@ -71,7 +71,7 @@ watchEffect((cleanupFn) => {
          +
           </Button>
     </h1>
-    <span class="justify-self-end text-indigo-700 py-1 px-4 rounded-md   font-bold text-right w-full"> Total: $ {{ totalCurrentBalance  }}</span>
+    <span class="justify-self-end text-indigo-700 py-1 px-4 rounded-md   font-bold text-right w-full"> Total: $ {{ totalCurrentBalance  }} </span>
 
   </header>
     <!-- component -->
@@ -79,9 +79,9 @@ watchEffect((cleanupFn) => {
     <div v-for="account in paginate(investmentData, itemsPerPage, currentPage)" :key="account.id">
       <!-- Render each investment account -->
       <div class="flex items-center justify-between">
-        <span class="text-sm text-slate-500">${{ account.current_balance }}</span>
+        <span class="text-sm text-slate-500">${{ account.current_balance }} - {{ account.account_name }}</span>
         <span class="px-2 py-1 bg-indigo-100 rounded-lg text-xs text-indigo-700 font-medium min-w-[46px] text-center">
-          {{ account.account_name }}
+          {{ account.bank_name }}
         </span>
       </div>
       <div class="w-full bg-slate-100 h-8 mb-6 mt-2 rounded-md">

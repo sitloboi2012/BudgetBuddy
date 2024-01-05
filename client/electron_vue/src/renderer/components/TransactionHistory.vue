@@ -58,7 +58,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <header class="  h-16 border-t ps-5  flex items-center w-full ">
+  <header class="  pt-6 pb-0 border-t ps-5  flex items-center w-full ">
     
     <h1 class="font-semibold text-lg w-full flex items-center "><span class="w-max">Transaction History</span>
         <Button class="w-6 h-6 p-0 ms-4 bg-indigo-700 align-middle">

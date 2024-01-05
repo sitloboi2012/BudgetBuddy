@@ -3,6 +3,8 @@
 from pydantic import BaseModel
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from enum import Enum
+import certifi as certifi
 import os
 
 class StrEnum(str, Enum):
@@ -19,7 +21,7 @@ class Constant(StrEnum):
 class Message(BaseModel):
     message: str
 
-client = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
+client = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
 BANK_COLLECTION = client.get_collection("BANK_INFO")
 ACCOUNT_COLLECTION = client.get_collection("ACCOUNTS")
 SAVING_COLLECTION = client.get_collection("SAVING_ACCOUNTS")
