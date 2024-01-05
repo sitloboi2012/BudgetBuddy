@@ -3,17 +3,12 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Form
 from fastapi.responses import JSONResponse
 from bson import ObjectId
-from constant import Constant
-from pymongo import MongoClient
+from constant import PLANNING_SPENDING_COLLECTION, EXPENSE_SPENDING_COLLECTION, TRANSACTION_COLLECTION
+from datetime import datetime
 
-from models.plan_spending import PlannedSpendingModel, PlannedSpendingModelView, MonthlyExpensePlan, MonthlyExpensePlanModelView
+from models.plan_spending import PlannedSpendingModel, PlannedSpendingModelView, MonthlyExpensePlan, MonthlyExpensePlanModelView, TransactionModelView
 
 router = APIRouter(prefix="/api/v1", tags=["Plan Settings"])
-
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-PLANNING_SPENDING_COLLECTION = CLIENT.get_collection("PLANNING_SPENDING")
-EXPENSE_SPENDING_COLLECTION = CLIENT.get_collection("EXPENSE_SPENDING")
-
 
 @router.post("/plan_spending/{user_id}/create")
 def create_spending(
@@ -38,10 +33,13 @@ def create_spending(
 
 @router.get("/plan_spending/{user_id}/{timeframe}")
 def get_all_spending(user_id: str, timeframe: str):
-    spending = PLANNING_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id), "time_duration": timeframe})
-    return JSONResponse(
-        status_code=200,
-        content=[PlannedSpendingModelView(**spending).dict() for spending in spending])
+    spendings = PLANNING_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id), "time_duration": timeframe})
+    list_speding = []
+    for spending in spendings:
+        spending_dict = PlannedSpendingModelView(**spending).dict()
+        spending_dict["id"] = str(spending["_id"])
+        list_speding.append(spending_dict) 
+    return JSONResponse(status_code=200,content= list_speding)
 
 @router.put("/plan_spending/{user_id}/{spending_id}")
 def update_spending(
@@ -82,6 +80,7 @@ def create_monthly_expense_plan(
     user_id: str,
     category: str = Form(..., description="Category of the spending"),
     initial_amount: int | float = Form(..., description="Initial amount of the spending"),
+    time_duration: str = Form(..., description="Time Duration for Expense Planning. For example: Jan 2024, Feb 2023, etc.")
 ):
     if EXPENSE_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "category": category}) is not None:
         raise HTTPException(status_code=400, detail="Spending name already exist")
@@ -91,16 +90,27 @@ def create_monthly_expense_plan(
         category=category,
         initial_amount=initial_amount,
         current_total_use=0,
+        time_duration = time_duration
     ).dict()
     EXPENSE_SPENDING_COLLECTION.insert_one(spending)
     return JSONResponse(status_code=200, content={"message": "Spending created successfully"})
 
 @router.get("/monthly_expense_plan/{user_id}")
 def get_all_monthly_expense_plan(user_id: str):
-    spending = EXPENSE_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id)})
+    spendings = EXPENSE_SPENDING_COLLECTION.find({"user_id": ObjectId(user_id)})
+    list_speding = []
+    for spending in spendings:
+        spending_dict = MonthlyExpensePlanModelView(**spending).dict()
+        spending_dict["id"] = str(spending["_id"])
+        parsed_date = datetime.strptime(spending["time_duration"], "%b %Y")
+        formatted_date = parsed_date.strftime("%Y-%m")
+        list_transaction = TRANSACTION_COLLECTION.find({"user_id": ObjectId(user_id), "category": spending["category"]})
+        list_transaction_by_date = [TransactionModelView(**transaction).dict() for transaction in list_transaction if formatted_date in transaction["transaction_date"]]
+        spending_dict["list_transaction"] = list_transaction_by_date
+        list_speding.append(spending_dict) 
     return JSONResponse(
         status_code=200,
-        content=[MonthlyExpensePlanModelView(**spending).dict() for spending in spending])
+        content= list_speding)
     
 @router.delete("/monthly_expense_plan/{user_id}/{spending_id}")
 def delete_monthly_expense_plan(user_id: str, spending_id: str):

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import JSONResponse
-from constant import Message, Constant
+from constant import Message, USERS
 from pymongo import MongoClient
 import bcrypt
 import certifi as certifi
@@ -16,7 +16,7 @@ def login(user_name: str = Form(..., description="Username of the user"),
           ):
 
     # Find the user account in the database
-    account = db.find_one({'username': user_name})
+    account = USERS.find_one({'username': user_name})
     
     if account:
         # Compare the entered password with the stored hashed password
