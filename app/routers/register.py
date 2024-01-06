@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
 from models.users import UserInfo
 from constant import Message, USERS
@@ -10,8 +10,9 @@ from models.email import EmailSchema, send_email
 
 router = APIRouter(prefix="/api/v1", tags=["User Register"])
 
-@router.post("/register")
-def register_user(
+@router.post("/register", responses= {409: {"model": Message},
+                                      422: {"model": Message}})
+def register_user(  background_tasks: BackgroundTasks, # this for email send
     user_name: str = Form(..., description="Username of the user"),
     password: str = Form(..., description="Password of the user"),
     full_name: str = Form(..., description="Full name of the user"),
