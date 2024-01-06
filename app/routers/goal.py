@@ -8,6 +8,7 @@ from bson import ObjectId
 from datetime import datetime
 from typing import Optional
 from models.goal import GoalSettingBaseModel, GoalModelView
+import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["Goal Setting"])
 

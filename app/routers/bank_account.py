@@ -15,6 +15,7 @@ from models.bank_account import (
     GetAllAccountName,
 )
 from bson import ObjectId
+import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["CRUD Bank Account"])
 

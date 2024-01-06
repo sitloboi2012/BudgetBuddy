@@ -4,8 +4,11 @@ from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
 from constant import BANK_INFO
 from models.bank_info import BankInfo, ListOfBankInfo
+import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["Banking Data Info"])
+client = MongoClient(host= Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True ).get_database("dev")
+bank_info = client.get_collection("BANK_INFO")
 
 @router.get("/get_bank_data")
 def get_bank_data():

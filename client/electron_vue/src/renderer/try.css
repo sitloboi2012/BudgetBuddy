@@ -82,12 +82,16 @@ top: 60px;
 .total h2{
   color: rgb(255, 255, 255);
 }
+.total h5{
+  color: rgb(255, 255, 255);
+}
 .networth_container{
   margin-top: 10px;
   padding: 4px;
   background-color: #7981d030;
   border-radius: 15px;
   height: 600px;
+  width:290px;
 }
 .bank_acc{
   color: white;
@@ -101,33 +105,16 @@ top: 60px;
   margin: 7px;
 }
 
-button{
-  background-color: #6A56E7;
-  width: 240px;
-  border: none;
-  border-radius: 20px;
-  padding: 7px;
-  display: flex;
-  justify-content: space-between;
-}
-.add{
-  color: white;
-  position: absolute;
-  bottom: 18px;
-  left: 18px;
-  padding: 13px;
-  font-weight: 700;
-  justify-content: center;
-}
-
 .screen{
-  background-color: #ffffff14;
+  background-color: rgb(255, 255, 255);
   position: absolute;
   left: 372px;
   top: 80px;
   width: 60%;
   height: 86%;
   border-radius: 20px;
+  overflow: hidden;
+  overflow-y: auto;
 }
 @media screen and (min-width: 1400px){
   .screen{
