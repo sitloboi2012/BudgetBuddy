@@ -4,6 +4,12 @@
             <button>
                 <h1 :style="{fontSize: '20px'}">{{ plan.category }}</h1>
                 <p :style="{fontSize: '13px', paddingBottom: '20px'}">{{ plan.current_total_use }} spent</p>
+                <fwb-progress
+                  :progress="50"
+                  label-position="inside"
+                  label-progress
+                  size="lg"
+                />
                 <p :style="{fontSize: '13px', paddingBottom: '20px'}">of {{ plan.initial_amount }}</p>
                 <h2 :style="{fontSize: '20px'}">$ {{ plan.initial_amount - plan.current_total_use }} left</h2>
             </button>
@@ -17,9 +23,10 @@
 </template>
 <script setup lang="ts">
 import { ref, defineEmits, onMounted, computed } from 'vue';
+import { FwbProgress } from 'flowbite-vue'
 import axios from 'axios';
 
-const user_id = '657dda0a27f6591e910a6f84';
+const user_id = '6593ccdf025b256e0ffe24e8';
 const monthlyExpensePlans = ref([]);
 let viewData = ref(null)
 
@@ -40,7 +47,6 @@ onMounted(() => {
 const clickView = (itemView: any) => {
   viewData = itemView,
   emits("view-plan", viewData);
-  console.log("view-plan:",viewData)
 }
 const emits = defineEmits(['add-plan', 'view-plan']);
 

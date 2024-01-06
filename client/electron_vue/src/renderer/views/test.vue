@@ -1,48 +1,82 @@
 <template>
-  <div>
-    <month-picker-input
-      :no-default="true"
-      @input="handleMonthChange"
-      :lang="language"
-      :months="customMonths"
-    ></month-picker-input>
-
-    <p class="text-white">Month chosen: {{ selectedMonth }}</p>
+  <div id="chart">
+    <apexchart type="pie" width="380" :options="chartOptions" :series="series"></apexchart>
   </div>
 </template>
 
 <script>
-import { MonthPickerInput } from 'vue-month-picker';
+import VueApexCharts from 'vue3-apexcharts';
+import axios from 'axios';
 
 export default {
+  name: 'Chart',
   components: {
-    MonthPickerInput,
+    apexcharts: VueApexCharts,
   },
   data() {
     return {
-      selectedMonth: null,
-      language: 'en', // Change this to your preferred language code
-      customMonths: [], // You can provide your own array of custom month names
+      series: [],
+      chartOptions: {
+        chart: {
+          width: 380,
+          type: 'pie',
+        },
+        labels: ['Entertainment','Work'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: 'bottom',
+            },
+          },
+        }],
+      },
     };
   },
+  async mounted() {
+    await this.fetchTransactionData();
+  },
   methods: {
-    handleMonthChange(date) {
-      // Handle the month change event
-      this.selectedMonth = this.formatDate(date);
+    async fetchTransactionData() {
+      try {
+        const response = await axios.get('http://localhost:8080/api/v1/transaction/6593ccdf025b256e0ffe24e8');
+        const transactions = response.data;
+
+        const currentYear = new Date().getFullYear();
+
+        const filteredTransactions = transactions.filter((transaction) => {
+          const transactionDate = new Date(transaction.transaction_date);
+          return (
+            transactionDate.getFullYear() === currentYear &&
+            transaction.transaction_type === 'Outcome'
+          );
+        });
+
+        const groupedTransactions = this.groupByCategory(filteredTransactions);
+
+        this.chartOptions.labels = Object.keys(groupedTransactions);
+        console.log('Chart Labels:', this.chartOptions.labels);
+        this.series = Object.values(groupedTransactions);
+      } catch (error) {
+        console.error('Error fetching transaction data:', error);
+      }
     },
-    formatDate(date) {
-      // Format the date as per your requirement
-      const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December',
-      ];
+    groupByCategory(transactions) {
+      return transactions.reduce((acc, transaction) => {
+        const category = transaction.category;
 
-      const monthIndex = date.getMonth();
-      const year = date.getFullYear();
+        if (!acc[category]) {
+          acc[category] = 0;
+        }
 
-      return `${monthNames[monthIndex]} ${year}`;
+        acc[category] += transaction.Amount;
+
+        return acc;
+      }, {});
     },
   },
 };
 </script>
-

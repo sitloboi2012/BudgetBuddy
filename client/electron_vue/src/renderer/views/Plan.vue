@@ -7,11 +7,13 @@
     <EditIncome class="form" v-if="isVisible6" @close-modal="closeForm6" :data="newdata"/>
     <EditSub class="form" v-if="isVisible7" @close-modal="closeForm7" :data="newdata"/>
     <EditBill class="form" v-if="isVisible9" @close-modal="closeForm9" :data="newdata"/>
+    <EditGoal class="form" v-if="isVisible10" @close-modal="closeForm10" :data="newdata"/>
+
     <section class="planning">
       <div class="networth">
         <div class="total">
           <p class='label'>Planning for</p>
-          <h5 class= 'label'>{{ month }}</h5>
+          <Month @send-month="collectmonth($event)" @send-year="collectyear($event)"/>
         </div>
         <div class="overview-section bg-violet-600" @click="showComponent('incomeAfterBill')" >
           <h2 class="text-xl text-white font-bold">{{ income }}</h2>
@@ -28,15 +30,17 @@
       </div>
       <div class="screen">
         <!-- <Test v-if="selectedComponent === 'incomeAfterBill'" @edit="collect($event)"/> -->
-        <IncomeafterBill v-if="selectedComponent === 'incomeAfterBill'" @add-income="receiveEmit2" @add-sub="receiveEmit3" @add-bill="receiveEmit8" @edit-income="collect1($event)" @edit-sub="collect2($event)" @edit-bill="collect3($event)"/>
-        <Plan2 v-else-if="selectedComponent === 'plannedSpending'" @add-plan="receiveEmit4"/>
-        <SavingGoals v-else-if="selectedComponent === 'savingGoal'" @add-goal="receiveEmit5"/>
+        <IncomeafterBill v-if="selectedComponent === 'incomeAfterBill'" @add-income="receiveEmit2" @add-sub="receiveEmit3" @add-bill="receiveEmit8" @edit-income="collect1($event)" @edit-sub="collect2($event)" @edit-bill="collect3($event)" :month="newmonth" :year="newyear" />
+        <Plan2 v-else-if="selectedComponent === 'plannedSpending'" @add-plan="receiveEmit4"  @view-plan="handleView($event)" :month="newmonth" :year="newyear"/>
+        <SavingGoals v-else-if="selectedComponent === 'savingGoal'" @add-goal="receiveEmit5" @edit-goal="collect4($event)" :month="newmonth" :year="newyear"/>
+        <SpecificPlan v-else-if="selectedComponent === 'viewSpecificPlan'" :data="newdata" @go-back="showComponent('plannedSpending')"/>
       </div>
     </section> 
 </template>
 
 <script setup lang="ts">
   import { ref, Ref } from 'vue'
+  import Month from '../components/month.vue'
   import IncomeafterBill from '../components/IncomeafterBill.vue'
   import Plan2 from '../components/PlannedSpending.vue'
   import SavingGoals from '../components/SavingGoals.vue'
@@ -48,8 +52,9 @@
   import AddGoal from "../components/AddGoal.vue"
   import EditIncome from "../components/EditIncome.vue"
   import EditSub from '../components/EditSub.vue'
+  import SpecificPlan from '../components/SpecificPlan.vue'
+  import EditGoal from '../components/EditGoal.vue'
 
-  const month = 'Jan 2024';
   const income = '$8,469.00';
   const plannedSpending = '$30.00';
   const savingGoals = '$500.00';
@@ -63,8 +68,23 @@
   const isVisible7 = ref(false);
   const isVisible8 = ref(false);
   const isVisible9 = ref(false);
+  const isVisible10 = ref(false);
   let newdata = ref(null)
+  let newmonth = ref()
+  let newyear = ref()
 
+  const collectmonth = (event) => {
+    newmonth = event
+    console.log("seemonth", newmonth)
+  }
+  const collectyear = (event) => {
+    newyear = event
+    console.log("seeyear", newyear)
+  }
+  const handleView = (event) => {
+    newdata = event
+    showComponent('viewSpecificPlan');
+  }
   const collect1 = (event) => {
     newdata = event
     console.log("see1", newdata)
@@ -79,6 +99,11 @@
     newdata = event
     console.log("see3", newdata)
     isVisible9.value = true;
+  }
+  const collect4 = (event) => {
+    newdata = event
+    console.log("see4", newdata)
+    isVisible10.value = true;
   }
   const receiveEmit2 = () => {
     isVisible2.value = true;
@@ -119,7 +144,9 @@
   const closeForm9 = () => {
     isVisible9.value = false;
   }
-
+  const closeForm10 = () => {
+    isVisible10.value = false;
+  }
   const showComponent = (componentName: string) => {
     selectedComponent.value = componentName;
   };

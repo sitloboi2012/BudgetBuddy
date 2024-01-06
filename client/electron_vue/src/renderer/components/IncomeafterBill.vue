@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, toRefs, watch } from 'vue';
 import axios from 'axios';
 
 const user_id = '657deedb53a90ee98e224654';
@@ -61,7 +61,16 @@ const userBill = ref([]);
 const isShow = ref(false);
 const isShow2 = ref(false);
 const isShow3 = ref(false);
+const { month, year }  = defineProps(['month', 'year']);
+let that_month = toRefs(month);
+let that_year = toRefs(year);
 let editData = ref(null)
+
+watch(that_month,() => {
+  // This will run whenever the 'month' or 'year' props change
+  console.log('Fetching data for month:', month);
+  console.log('Fetching data for year:', year);// Call your function to fetch data based on month and year
+});
 
 const fetchPlan = async () => {
   try {
@@ -70,6 +79,7 @@ const fetchPlan = async () => {
     userSubscription.value = response.data.filter((entry: { spending_type: string; }) => entry.spending_type === 'Subscription');
     console.log('Data from the server:', userIncome.value);
     console.log('Data from the server2:', userSubscription.value);
+
   } catch (error) {
     console.error('Error fetching account information:', error);
   }

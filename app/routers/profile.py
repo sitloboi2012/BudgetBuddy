@@ -1,19 +1,15 @@
 from fastapi import APIRouter, HTTPException, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
 from models.users import UserInfo
-from constant import Message, Constant
-from pymongo import MongoClient
+from constant import Message, USERS
 from bson import ObjectId 
 import bcrypt
 import uuid
 from fastapi.encoders import jsonable_encoder
-import certifi as certifi
-
-
 from models.email import EmailSchema, send_email  
+
+
 router = APIRouter(prefix="/api/v1", tags=["User Profile"])
-client = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
-db = client.get_collection("USERS")
 
 @router.get('/profile/{id}', responses= {404: {"model": Message},
                                         422: {"model": Message},
@@ -23,7 +19,7 @@ def profile(id: str):
     Return the user data information
     """
     if len(id) ==24:
-        account = db.find_one({"_id": ObjectId(id)})
+        account = USERS.find_one({"_id": ObjectId(id)})
         if account:
             try:
                 # Convert ObjectId to string
@@ -37,7 +33,7 @@ def profile(id: str):
         return  JSONResponse(status_code=401, content={"message": "Unauthorized"})
 
 
-@router.put('/profile/{id}/update', responses= {404: {"model": Message},
+@router.put('/profile/{id}', responses= {404: {"model": Message},
                                                 422: {"model": Message}})
 def update( background_tasks: BackgroundTasks,
             id:str,
@@ -47,12 +43,11 @@ def update( background_tasks: BackgroundTasks,
     """
     Send the update data, it can be password, number, address
     """
-    if len(id) == 24:
-        NewKey = uuid.uuid1().hex
-        NewPassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    NewKey = uuid.uuid1().hex
+    NewPassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        account = db.find_one({"_id": ObjectId(id)})
-        if account:
+    account = USERS.find_one({"_id": ObjectId(id)})
+    if account:
             try:
                 if number is None:
                     number = account["number"]
@@ -60,7 +55,7 @@ def update( background_tasks: BackgroundTasks,
                     address = account["address"]
                 str_password = NewPassword.decode('utf-8')
                 # Store the hashed password in the database
-                newAccount = db.find_one_and_update(
+                newAccount = USERS.find_one_and_update(
                     {"_id": ObjectId(id)},
                     {"$set": {"password": str_password,
                             "key": NewKey,
@@ -81,7 +76,6 @@ def update( background_tasks: BackgroundTasks,
                 return JSONResponse(content=jsonable_encoder(newAccount))
             except ValueError as e:
                 return JSONResponse(status_code=422, content={"message": str(e)})
-        else:
-            return JSONResponse(status_code=404, content={"message": "User not found"})
     else:
-        return JSONResponse(status_code=401, content={"message": "Unauthorized"})
+            return JSONResponse(status_code=404, content={"message": "User not found"})
+   

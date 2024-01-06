@@ -2,9 +2,11 @@
     <div class="plan-income">
     <article class="plann" v-for="goal in allGoals" :key="goal">
         <button>
-            <h1 :style="{fontSize: '20px'}">{{ goal.goal_name }}</h1>
-            <p :style="{fontSize: '13px', paddingBottom: '20px'}">{{ goal.account }}</p>
-            <h2 :style="{fontSize: '20px', paddingBottom: '20px'}">$2356 saved so far</h2>
+            <div class="flex space-between">
+            <h1 class="flex-1" :style="{fontSize: '20px'}">{{ goal.goal_name }}</h1>
+            <p class="flex-1" @click="clickEdit(goal)">:</p>
+            </div>
+            <h2 :style="{fontSize: '20px', paddingBottom: '20px'}">${{ goal.current_balance || 0}} saved so far</h2>
             <div class="details">    
                 <div class="left-column">
                     <p>saved</p>
@@ -27,8 +29,9 @@
     import { ref, defineEmits, onMounted } from 'vue';
     import axios from 'axios';
     
-    const user_id = '657deedb53a90ee98e224654';
+    const user_id = '6593ccdf025b256e0ffe24e8';
     const allGoals = ref([])
+    let editData = ref(null)
     
 
     
@@ -45,8 +48,13 @@
         onMounted(() => {
         fetchGoals();
         });
+        const clickEdit = (itemEdit: any) => {
+            editData = itemEdit,
+            emits("edit-goal", editData);
+            console.log("edit-goal:",editData)
+        }
 
-        const emits = defineEmits(['add-goal']);
+        const emits = defineEmits(['add-goal','edit-goal']);
 
         const addGoal = () => {
         emits('add-goal');

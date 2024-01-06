@@ -4,16 +4,13 @@ import yfinance as yf
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from pymongo import MongoClient
-from constant import Constant
+from constant import INVESTMENT_COLLECTION
 from bson import ObjectId
 from models.investment_model import Stock, ListOfStocks, GetInvestedAccountData
 
 router = APIRouter(prefix="/api/v1", tags=["Investment Page"])
 
 STOCK_LIST = ["aapl", "msft", "tsla", "metv", "goog", "amzn", "nflx"]
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-INVESTMENT_COLLECTION = CLIENT.get_collection("INVESTMENT_ACCOUNTS")
 
 @router.get("/get_all_stocks", response_model=ListOfStocks)
 def get_stocks():

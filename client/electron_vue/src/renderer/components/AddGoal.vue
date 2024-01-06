@@ -51,12 +51,14 @@
   import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
   import axios from 'axios';
   
-  const user_id = '657deedb53a90ee98e224654';
+  const user_id = '6593ccdf025b256e0ffe24e8';
   const goalname = ref('');
   const amount = ref('');
   const time = ref('');
   const linkaccount = ref('')
   const today = new Date().toLocaleDateString('en-CA')
+
+  console.log("display", today)
   
   const isDisplay = ref(true);
   const emits = defineEmits(['close-modal']);

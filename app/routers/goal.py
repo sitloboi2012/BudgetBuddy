@@ -3,8 +3,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import JSONResponse
-from constant import Constant
-from pymongo import MongoClient
+from constant import GOAL_SETTING_BASE, SAVING_COLLECTION
 from bson import ObjectId
 from datetime import datetime
 from typing import Optional
@@ -12,9 +11,6 @@ from models.goal import GoalSettingBaseModel, GoalModelView
 import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["Goal Setting"])
-client = MongoClient(host=Constant.MONGODB_URI,tlsCAFile=certifi.where(), tls=True).get_database("dev")
-GOAL_SETTING_BASE = client.get_collection("GOAL_SETTINGS")
-
 
 @router.post("/goal_saving_setting/{user_id}")
 def set_goal(
@@ -108,9 +104,16 @@ def get_single_goal_view(
     goal = GOAL_SETTING_BASE.find_one({"_id": ObjectId(goal_id), "user_id": ObjectId(user_id)})
     if goal is None:
         raise HTTPException(status_code=400, detail="Goal not found")
+    goal_data = GoalModelView(**goal).dict()
+    goal_data["connected_account_name"]= goal["connected_account_name"]
+    if goal["connected_account_id"] is not None:
+            current_balance = SAVING_COLLECTION.find_one({"account_id":ObjectId(goal["connected_account_id"]),"account_name":goal["connected_account_name"]})["current_balance"]
+            goal_data["current_balance"] = current_balance
+    else:
+            goal_data["current_balance"] = None
     return JSONResponse(
         status_code=200,
-        content=GoalModelView(**goal).dict()
+        content= goal_data
     )
 
 @router.get("/goal_saving_setting/{user_id}")
@@ -130,7 +133,13 @@ def get_all_goal_view(
     goal_list = []
     for goal in goals:
         goal_data = GoalModelView(**goal).dict()
+        goal_data["id"] = str(goal['_id'])
         goal_data["connected_account_name"]= goal["connected_account_name"]
+        if goal["connected_account_id"] is not None:
+            current_balance = SAVING_COLLECTION.find_one({"account_id":ObjectId(goal["connected_account_id"]),"account_name":goal["connected_account_name"]})["current_balance"]
+            goal_data["current_balance"] = current_balance
+        else:
+            goal_data["current_balance"] = None
         goal_list.append(goal_data)
     return JSONResponse(
         status_code=200,

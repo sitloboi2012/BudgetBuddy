@@ -3,13 +3,15 @@
         <h1 class="inline-block text-white text-xl">Accounts</h1>
         <button class="inline-block text-white font-bold text-xs bg-blue-600 p-2 rounded-2xl" @click="addAccount">+ ACCOUNT</button>
     </div>
-    <div v-for="account in allAccounts" :key="account" class="container">
-        <h1>{{ account[2] }}</h1>
-        <h1>{{ account[1] }}</h1>
+    <div v-for="account in allAccounts" :key="account" class="container mt-8 m-4 p-1">
+        <div class="flex space-between">
+            <h1 class="flex-1 font-bold">{{ account[0] }}</h1>
+            <h1 class="flex-1 font-bold" @click="clickEdit(account)">:</h1>
+        </div>
         <div class="inner-content">
             <div class="left-content">
-                <h5>{{ account[0] }}</h5>
-                <p>{{ account[0] }}</p>
+                <h5>{{ account[4] }}</h5>
+                <h5>{{ account[3] }}</h5>
             </div>
             <div class="right-content">
                 <button>:</button>
@@ -24,6 +26,7 @@
 
     const user_id = '657deedb53a90ee98e224654';
     const allAccounts = ref([]);
+    let editData = ref(null)
 
     const fetchAccount = async () => {
     try {
@@ -35,12 +38,17 @@
         console.error('Error fetching account information:', error);
     }
     };
+    const clickEdit = (itemEdit: any) => {
+            editData = itemEdit,
+            emits("edit-account", editData);
+            console.log("edit-account:",editData)
+    }
 
     onMounted(() => {
     fetchAccount();
     });
 
-    const emits = defineEmits(['add-account']);
+    const emits = defineEmits(['add-account', 'edit-account']);
 
     const addAccount = () => {
     emits('add-account');
@@ -55,7 +63,8 @@
         width: 95%;
     }
     .container{
-    background-color: white;
+    background-color: rgb(193, 184, 236);
+    border-radius: 20px;
     }
 
     .inner-content {

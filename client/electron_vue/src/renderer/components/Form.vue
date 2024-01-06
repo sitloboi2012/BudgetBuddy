@@ -26,9 +26,9 @@
             label="Balance"
             class="p-2"
           />
-          <fwb-input
+          <fwb-select
             v-model="accountbank"
-            placeholder="Enter your bank"
+            :options="bank"
             label="Bank"
             class="p-2"
           />
@@ -84,6 +84,11 @@ const type = [
   { value: 'Saving', name: 'Saving' },
   { value: 'Investment', name: 'Investment' },
 ];
+const bank = [
+  { value: 'VIB', name: 'VIB' },
+  { value: 'VIETCOMBANK', name: 'VIETCOMBANK' },
+  { value: 'TECHCOMBANK', name: 'TECHCOMBANK' },
+]
 
 const isShowModal = ref(true);
 let selectedFile = null;

@@ -9,7 +9,7 @@ import Test from "../views/test.vue"
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Login },
-  { path: '/profile', component: Test},
+  { path: '/profile', component: Profile},
   { path: '/home', component: Home },
   { path: '/plan', component: Plan },
   { path: '/login', component: Login },

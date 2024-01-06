@@ -1,13 +1,11 @@
 from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import JSONResponse
-from constant import Message, Constant
+from constant import Message, USERS
 from pymongo import MongoClient
 import bcrypt
 import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["User Login"])
-client = MongoClient(host=Constant.MONGODB_URI, tlsCAFile=certifi.where(), tls=True).get_database("dev")
-db = client.get_collection("USERS")
 
 @router.post('/login', responses={401: {'model': Message}, 404: {'model': Message}})
 def login(user_name: str = Form(..., description="Username of the user"),
@@ -16,13 +14,13 @@ def login(user_name: str = Form(..., description="Username of the user"),
           ):
 
     # Find the user account in the database
-    account = db.find_one({'username': user_name})
+    account = USERS.find_one({'username': user_name})
     
     if account:
         # Compare the entered password with the stored hashed password
         if bcrypt.checkpw(password.encode('utf-8'), account['password'].encode('utf-8')):
             if key == account['key']:
-                return JSONResponse(content={"user_name": user_name})
+                return JSONResponse(content={"user_name": user_name, "user_id": str(account["_id"])})
             else:
                 return JSONResponse(status_code=401, content={'message': "Key is incorrect."})
         else:

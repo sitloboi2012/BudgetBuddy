@@ -4,14 +4,12 @@ from models.transaction import GetTransactionInformation
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
-from constant import Message, Constant
-from pymongo import MongoClient
+from constant import Message, TRANSACTION_COLLECTION
 from bson import ObjectId
 import re
 
 router = APIRouter(prefix="/api/v1", tags=["Report Data Page"])
-client = MongoClient(host= Constant.MONGODB_URI ).get_database("dev")
-TRANSACTION_COLLECTION = client.get_collection("TRANSACTION_HISTORY")
+
 
 @router.get("/report/{user_id}/{month}/{year}")
 def get_monthly_transaction_data(
