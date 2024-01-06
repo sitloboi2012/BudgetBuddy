@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 from constant import Message, USERS
 from pymongo import MongoClient
 import bcrypt
-import certifi as certifi
 
 router = APIRouter(prefix="/api/v1", tags=["User Login"])
 

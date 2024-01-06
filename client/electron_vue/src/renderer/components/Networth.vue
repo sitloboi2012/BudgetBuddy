@@ -3,109 +3,85 @@
   <section class="networth">
     <div class="total">
       <p class="label">Networth</p>
-      <h2 class="label">{{ totalNetworth }}</h2>
+      <h2 class="label">$0</h2>
     </div>
-    <div class="networth_container">
-      <article class="bank_acc">
-        <div v-for="accountType in uniqueAccountTypes" :key="accountType">
-          <button @click="toggleAccountType(accountType)">
-            <p>{{ accountType }}</p>
-            <p>{{ getSumOfAccount(accountType) }}</p>
+      <div class="networth_container">
+        <article class="bank_acc">
+          <button @click="isShow = !isShow">
+            <p>Bank</p>
+            <p>$0</p>
           </button>
-          <div v-if="selectedAccountTypes.includes(accountType)">
-            <div v-for="account in getAccountsByType(accountType)" :key="account[0]" class="flex justify-between">
-              <p class="flex-1 pb-2.5">{{ account[0] }}</p>
-              <p class="flex-1 pb-2.5">{{ account[1] }}</p>
-            </div>
-          </div>
-        </div>
-      </article>
+          <div v-if="isShow">Checking 1</div>
+        </article>
+        <article class="bank_acc">
+          <button @click="isShow2 = !isShow2">
+            <p>Cash</p>
+            <p>$0</p>
+          </button>
+          <div v-if="isShow2">Checking 1</div>
+        </article>
+        <article class="bank_acc">
+          <button @click="isShow3 = !isShow3">
+            <p>Credit</p>
+            <p>$0</p>
+          </button>
+          <div v-if="isShow3">Checking 1</div>
+        </article>
+        <article class="bank_acc">
+          <button @click="isShow4 = !isShow4">
+            <p>Saving</p>
+            <p>$0</p>
+          </button>
+          <div v-if="isShow4">Checking 1</div>
+        </article>
+        <article class="bank_acc">
+          <button @click="isShow5 = !isShow5">
+            <p>Investment</p>
+            <p>$0</p>
+          </button>
+          <div v-if="isShow5">Checking 1</div>
+        </article>
 
-      <button @click="addAccount" class="add">ADD</button>
-    </div>
+        <button @click="addAccount" class="add">Add</button>
+      </div>
   </section>
 </template>
+<script>
+  import Swal from 'sweetalert2';
 
-<script setup lang="ts">
-import { ref, defineEmits, onMounted, computed } from 'vue';
-import axios from 'axios';
+  export default {
+    name: "ToggleDiv",
+    data: function () {
+      return {
+        isShow: false,
+        isShow2: false,
+        isShow3: false,
+        isShow4: false,
+        isShow5: false,
+      };
+    },
 
-const user_id = '657deedb53a90ee98e224654';
-const userAccounts = ref([]);
-const selectedAccountTypes = ref([]);
+    props: {
+      msg: String,
+    },
 
-const fetchBankAccount = async () => {
-  try {
-    const response = await axios.get(`http://localhost:8080/api/v1/${user_id}`);
-    userAccounts.value = response.data.list_account_name;
-  } catch (error) {
-    console.error('Error fetching account information:', error);
-  }
-};
+    methods:{
+      addAccount(){
+        Swal.fire({
+          title: 'Error!',
+          text: 'Do you love it',
+          icon: 'error',
+          confirmButtonText: 'Cool'
+        });
+      }
+    }
 
-onMounted(() => {
-  fetchBankAccount();
-});
-
-const emits = defineEmits(['add-account']);
-
-const addAccount = () => {
-  emits('add-account');
-};
-
-const uniqueAccountTypes = computed(() => {
-  return Array.from(new Set(userAccounts.value.map(account => account[4])));
-});
-
-const getSumOfAccount = (accountType) => {
-  return userAccounts.value
-    .filter(account => account[4] === accountType)
-    .reduce((sum, account) => sum + parseFloat(account[1]), 0)
-    .toFixed(2);
-};
-
-const getAccountsByType = (accountType: any) => {
-  return userAccounts.value.filter(account => account[4] === accountType);
-};
-
-const totalNetworth = computed(() => {
-  return userAccounts.value.reduce((sum, account) => sum + parseFloat(account[1]), 0).toFixed(2);
-});
-
-const toggleAccountType = (accountType: any) => {
-  const index = selectedAccountTypes.value.indexOf(accountType);
-  if (index === -1) {
-    selectedAccountTypes.value.push(accountType);
-  } else {
-    selectedAccountTypes.value.splice(index, 1);
-  }
-};
+  };
 </script>
-
 <style scoped>
   .notShown {
     visibility: hidden !important;
   }
-
-  button {
-    background-color: #6A56E7;
-    width: 250px;
-    border: none;
-    border-radius: 20px;
-    padding: 8px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-  }
-  .add{
-  color: white;
-  font-weight: 700;
-  font-size: small;
-  position: absolute;
-  bottom: 8px;
-  left: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 </style>
+
+
