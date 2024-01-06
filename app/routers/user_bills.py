@@ -42,7 +42,7 @@ def get_bill(user_id: str,):
                 recurrent_date_value=value["recurrent_date_value"],
                 recurrent_reminder=value["recurrent_reminder"]
             ).dict()
-            for value in list_bills
+            for value in list_bills if value["recurrent_reminder"] == True 
         ]
 
     if not array:
