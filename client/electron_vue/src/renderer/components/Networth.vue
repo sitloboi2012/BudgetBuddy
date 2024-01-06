@@ -59,7 +59,7 @@ const uniqueAccountTypes = computed(() => {
 
 const getSumOfAccount = (accountType) => {
   return userAccounts.value
-    .filter(account => account[2] === accountType)
+    .filter(account => account[4] === accountType)
     .reduce((sum, account) => sum + parseFloat(account[1]), 0)
     .toFixed(2);
 };

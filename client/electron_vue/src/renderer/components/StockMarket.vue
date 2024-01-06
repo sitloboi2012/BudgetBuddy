@@ -3,11 +3,19 @@ import axios from 'axios';
 import { ref, onMounted, watch } from 'vue';
 
 const stocks = ref([]);
+const originalStocks = ref([]);
+const activeButton = ref('hot');
+
+const setActiveButton = (button) => {
+  activeButton.value = button;
+  console.log(activeButton.value);
+};
 
 const fetchStockData = async () => {
   try {
     const response = await axios.get('http://localhost:8080/api/v1/get_all_stocks');
     stocks.value = response.data.list_of_stocks;
+    originalStocks.value = response.data.list_of_stocks;
     console.log(stocks.value);
     
   } catch (error) {
@@ -18,14 +26,16 @@ const fetchStockData = async () => {
 onMounted(fetchStockData);
 
 const filterUpTrendStock = () => {
-  fetchStockData();
-  stocks.value = stocks.value.filter(stock => stock.price_diff > 0);
+  setActiveButton('upside');
+ 
+  stocks.value = originalStocks.value.filter(stock => stock.price_diff > 0);
+ 
 };
 
 const filterDownTrendStock = () => {
- fetchStockData();
+  setActiveButton('downside');
 
-  stocks.value = stocks.value.filter(stock => stock.price_diff < 0);
+  stocks.value = originalStocks.value.filter(stock => stock.price_diff < 0);
 };
 </script>
 
@@ -37,22 +47,15 @@ const filterDownTrendStock = () => {
   </header>
 <header class="flex-none flex px-4 items-center">
 
-   <a href="#" class="inline-block rounded-full text-indigo-700
-                          bg-gray-100
-                          text-xs font-bold 
-                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 " >
+   <a href="#" :class="{ 'inline-block rounded-full text-indigo-700 bg-gray-100 text-xs font-bold mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1': activeButton === 'hot', 'inline-block rounded-full text-black text-xs mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1': activeButton !== 'hot' }" @click="setActiveButton('hot')" >
                          Hot
                       </a>
-       <a href="#" class="inline-block rounded-full text-black
-                          
-                          text-xs 
-                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 " @click="filterUpTrendStock()">
+       <a href="#" :class="{ 'inline-block rounded-full text-indigo-700 bg-gray-100 text-xs font-bold mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1': activeButton === 'upside', 'inline-block rounded-full text-black text-xs mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1': activeButton !== 'upside' }"
+       @click="filterUpTrendStock()
+                          ">
                           Upside
                       </a>
-       <a href="#" class="inline-block rounded-full text-black
-                          
-                          text-xs 
-                          mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1 " @click="filterDownTrendStock()">
+       <a href="#"  :class="{ 'inline-block rounded-full text-indigo-700 bg-gray-100 text-xs font-bold mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1': activeButton === 'downside', 'inline-block rounded-full text-black text-xs mr-1 md:mr-2 mb-2 px-2 md:px-4 py-1': activeButton !== 'downside' }" @click="filterDownTrendStock()">
                           Downside
                       </a>
   </header>
