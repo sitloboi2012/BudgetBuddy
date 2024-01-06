@@ -4,7 +4,7 @@ from fastapi import APIRouter, Form, File, UploadFile
 import pandas as pd
 from io import BytesIO
 from fastapi.responses import JSONResponse
-from constant import Constant
+from constant import BANK_COLLECTION, ACCOUNT_COLLECTION, SAVING_COLLECTION, INVESTMENT_COLLECTION, EXPENSE_COLLECTION
 from pymongo import MongoClient
 from models.bank_account import (
     SavingOrInvestmentAccount,
@@ -18,13 +18,6 @@ from bson import ObjectId
 
 router = APIRouter(prefix="/api/v1", tags=["CRUD Bank Account"])
 
-# MONGODB CONNECTION
-CLIENT = MongoClient(host=Constant.MONGODB_URI).get_database("dev")
-BANK_COLLECTION = CLIENT.get_collection("BANK_INFO")
-ACCOUNT_COLLECTION = CLIENT.get_collection("ACCOUNTS")
-SAVING_COLLECTION = CLIENT.get_collection("SAVING_ACCOUNTS")
-INVESTMENT_COLLECTION = CLIENT.get_collection("INVESTMENT_ACCOUNTS")
-EXPENSE_COLLECTION = CLIENT.get_collection("EXPENSE_ACCOUNTS")
 
 # MODEL INITIALIZATION
 MODEL = {
@@ -254,7 +247,9 @@ def get_all_account_data(user_id: str):
                 list_data = value[1].find({"account_id": ObjectId(account_id)})
                 if list_data:
                     for data in list_data:
-                        result.append([data["account_name"], data["current_balance"], key])
+                        bank_name = BANK_COLLECTION.find_one({"_id": ObjectId(data["bank_id"])})["bank_name"]
+                        result.append([data["account_name"], data["current_balance"], 
+                                       str(ObjectId(data["account_id"])),bank_name, key])
 
     return GetAllAccountName(list_account_name=result)
 
@@ -280,7 +275,9 @@ def get_all_account_type(
 
 @router.put("/{user_id}/{account_type}/{account_name}")
 def update_account_info(
-    user_id: str, account_type: str, account_name: str, new_value: dict[str, str]
+    user_id: str, account_type: str, account_name: str, 
+    new_account_name: str = Form(None, description="Account name of the user"),
+    new_bank_name:  str = Form(None, description="New bank name"),
 ):
     """
     Update the information of a bank account.
@@ -289,17 +286,23 @@ def update_account_info(
         user_id (str): The ID of the user.
         account_type (str): The type of the account.
         account_name (str): The name of the account.
-        new_value (dict[str, str]): The new values to update the account with.
 
     Returns:
         JSONResponse: The response indicating the success of the update.
     """
     account_type_model = MODEL[account_type]
-
-    if "account_name" in new_value:
-        account_type_model[1].update_one(
+    update_data = {}
+    if new_account_name is not None:
+        update_data["account_name"]= new_account_name
+    if new_bank_name is not None:
+        bank = BANK_COLLECTION.find_one({"bank_name": new_bank_name})
+        if bank is None:
+            return JSONResponse(status_code=422, content={ "message": f"Invalid bank name"})
+        bank_id = bank["_id"]
+        update_data["bank_id"] = ObjectId(bank_id)
+    account_type_model[1].update_one(
             {"account_name": account_name, "user_id": ObjectId(user_id)},
-            {"$set": {"account_name": new_value["account_name"]}},
+            {"$set": update_data},
         )
 
     return JSONResponse(
