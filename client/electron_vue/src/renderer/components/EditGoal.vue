@@ -22,7 +22,7 @@
           />
           <fwb-input
             v-model="time"
-            placeholder="2024/01/30"
+            placeholder="2024-01-30"
             label="Time"
             class="p-2"
           />

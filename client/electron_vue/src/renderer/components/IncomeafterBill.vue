@@ -12,7 +12,7 @@
         <p class="flex-1 pb-1.5">{{ incomeEntry.spending_name }}</p>
         <p class="flex-1 pb-1.5">{{ incomeEntry.amount.toFixed(2) }}</p>
         <button @click="clickEdit(incomeEntry)">Edit</button>
-        <button @click="clickDelete(incomeEntry)">Delete</button>
+        <button @click="clickDelete(incomeEntry.id)">Delete</button>
       </div>
     </article>
     <article class="income">
@@ -29,7 +29,7 @@
         <p class="flex-1 pb-1.5">{{ billEntry.bill_value.toFixed(2) }}</p>
         <p class="flex-1 pb-1.5">{{ billEntry.recurrent_reminder}}</p>
         <button @click="clickEdit3(billEntry)">Edit</button>
-        <button @click="clickDelete(billEntry)">Delete</button>
+        <button @click="clickDelete2(billEntry.bill_id)">Delete</button>
       </div>
     </article>
     <article class="income">
@@ -44,7 +44,7 @@
         <p class="flex-1 pb-1.5">{{ subEntry.spending_name }}</p>
         <p class="flex-1 pb-1.5">{{ subEntry.amount.toFixed(2) }}</p>
         <button @click="clickEdit2(subEntry)">Edit</button>
-        <button @click="clickDelete(subEntry)">Delete</button>
+        <button @click="clickDelete(subEntry.id)">Delete</button>
       </div>
     </article>
   </div>
@@ -65,6 +65,7 @@ const { month, year }  = defineProps(['month', 'year']);
 let that_month = toRefs(month);
 let that_year = toRefs(year);
 let editData = ref(null)
+let deleteId = ref(null)
 
 watch(that_month,() => {
   // This will run whenever the 'month' or 'year' props change
@@ -94,6 +95,27 @@ const fetchBill = async () => {
   }
 };
 
+const Delete = async (deleteId) => {
+  try {
+    const response = await axios.delete(`http://localhost:8080/api/v1/plan_spending/${user_id}/${deleteId}`);
+    console.log('Delete this ID', response.data);
+    await fetchPlan();
+    await fetchBill();
+  } catch (error) {
+    console.error('Error deleting entry:', error);
+  }
+};
+const Delete2 = async (deleteId) => {
+  try {
+    const response = await axios.delete(`http://localhost:8080/api/v1/user_bill/${user_id}/${deleteId}/delete`);
+    console.log('Delete this ID', response.data);
+    await fetchPlan();
+    await fetchBill();
+  } catch (error) {
+    console.error('Error deleting entry:', error);
+  }
+};
+
 const toggleShow = () => {
   isShow.value = !isShow.value;
 };
@@ -117,8 +139,13 @@ onMounted(() => {
 });
 
 const clickDelete = (itemDelete: any) => {
-  console.log(itemDelete)
-}
+  deleteId = itemDelete;
+  Delete(deleteId);
+};
+const clickDelete2 = (itemDelete: any) => {
+  deleteId = itemDelete;
+  Delete2(deleteId);
+};
 
 const clickEdit = (itemEdit: any) => {
   editData = itemEdit,

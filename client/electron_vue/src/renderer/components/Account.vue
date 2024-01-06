@@ -1,6 +1,6 @@
 <template>
     <div class="head1">
-        <h1 class="inline-block text-white text-xl">Accounts</h1>
+        <h1 class="inline-block text-black text-xl">Accounts</h1>
         <button class="inline-block text-white font-bold text-xs bg-blue-600 p-2 rounded-2xl" @click="addAccount">+ ACCOUNT</button>
     </div>
     <div v-for="account in allAccounts" :key="account" class="container mt-8 m-4 p-1">

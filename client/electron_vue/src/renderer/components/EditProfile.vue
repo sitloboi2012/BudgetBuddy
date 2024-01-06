@@ -3,28 +3,28 @@
     <fwb-modal v-if="isShowModal" @close="closeModal">
       <template #header>
         <div class="flex items-center text-lg p-4">
-          Add your account
+          Edit your profile
         </div>
       </template>
       <template #body>
         <div>
           <fwb-input
-            v-model="youraccount"
-            placeholder="enter your account"
-            label="Account Name"
+            v-model="user_address"
+            placeholder="enter your address"
+            label="Address"
             class="p-2"
           />
-          <fwb-select
-            v-model="accountbank"
-            :options="bank"
-            label="Bank"
+          <fwb-input
+            v-model="num"
+            placeholder="enter your phone number"
+            label="Phonenum"
             class="p-2"
           />
           <div class="flex justify-between p-2">
             <fwb-button @click="closeModal" color="alternative">
               Cancel
             </fwb-button>
-            <fwb-button @click="editAcc" color="alternative">
+            <fwb-button @click="editPro" color="alternative">
               Save
             </fwb-button>
           </div>
@@ -41,16 +41,11 @@ import axios from 'axios';
 
 const user_id = '657deedb53a90ee98e224654';
 let { data } = defineProps(['data']);
-let ac= toRefs(data);
-let youraccount = ref(ac[0])
-let balance = ref(ac[1])
-let accountbank = ref(ac[3])
-let selected = ref(ac[4])
-const bank = [
-  { value: 'VIB', name: 'VIB' },
-  { value: 'VIETCOMBANK', name: 'VIETCOMBANK' },
-  { value: 'TECHCOMBANK', name: 'TECHCOMBANK' },
-]
+let info= toRefs(data);
+let pass = ref(info[0])
+let num = ref(info[1])
+let user_address = ref(info[2])
+
 
 const isShowModal = ref(true);
 
@@ -61,22 +56,30 @@ function closeModal() {
   emits('close-modal');
 }
 
-async function editAcc() {
+async function editPro() {
+  // Convert string inputs to numbers using parseFloat
+  const phone = parseFloat(num.value);
 
+  // Create the request payload
   const requestData = {
-    new_account_name: youraccount.value,
-    new_bank_name: accountbank.value,
+    number: phone,
+    password: pass.value,
+    address: user_address.value,
   };
+  console.log('Sending data to server:', info);
+  // Log the data before making the request
+  console.log('Sending data to server:', requestData);
 
+  // Make the HTTP request
   try {
-    const response = await axios.put(`http://localhost:8080/api/v1/${user_id}/${selected.value}/${youraccount.value}`, requestData, {
+    const response = await axios.put(`http://localhost:8080/api/v1/profile/${user_id}`, requestData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
     withCredentials: true, // Include credentials in the request
     });
 
-    console.log('Server response:', response.data);
+    console.log('check:', response.data);
 
     // Handle success or update UI accordingly
   } catch (error) {
@@ -86,6 +89,6 @@ async function editAcc() {
   }
 }
   onMounted(() => {
-    editAcc();
+    editPro();
   });
 </script>

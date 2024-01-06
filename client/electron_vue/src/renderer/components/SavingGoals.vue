@@ -5,6 +5,7 @@
             <div class="flex space-between">
             <h1 class="flex-1" :style="{fontSize: '20px'}">{{ goal.goal_name }}</h1>
             <p class="flex-1" @click="clickEdit(goal)">:</p>
+            <p class="flex-1" @click="clickDelete(goal.id)">d</p>
             </div>
             <h2 :style="{fontSize: '20px', paddingBottom: '20px'}">${{ goal.current_balance || 0}} saved so far</h2>
             <div class="details">    
@@ -32,7 +33,7 @@
     const user_id = '6593ccdf025b256e0ffe24e8';
     const allGoals = ref([])
     let editData = ref(null)
-    
+    let deleteId = ref(null)
 
     
         const fetchGoals = async () => {
@@ -45,6 +46,16 @@
         }
         };
 
+        const Delete = async (deleteId) => {
+            try {
+                const response = await axios.delete(`http://localhost:8080/api/v1/goal_saving_setting/${user_id}/${deleteId}/delete`);
+                console.log('Delete this ID', response.data);
+                await fetchGoals();
+            } catch (error) {
+                console.error('Error deleting entry:', error);
+            }
+        };
+
         onMounted(() => {
         fetchGoals();
         });
@@ -53,6 +64,10 @@
             emits("edit-goal", editData);
             console.log("edit-goal:",editData)
         }
+        const clickDelete = (itemDelete: any) => {
+        deleteId = itemDelete;
+        Delete(deleteId);
+        };
 
         const emits = defineEmits(['add-goal','edit-goal']);
 
