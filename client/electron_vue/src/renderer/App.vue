@@ -1,45 +1,24 @@
 <script setup lang="ts">
-import { ref, computed, DefineComponent, ComponentOptionsMixin, ExtractPropTypes } from 'vue'
-import Home from './views/Homepage.vue' 
-import Plan from './views/Plan.vue'
-window.electronAPI.sendMessage('Hello from App.vue!');
-
-type PublicProps = {
-  title?: string;
-  description?: string;
-};
-
-interface RouteDefinition {
-  [path: string]: DefineComponent<{}, {}, {}, {}, {}, ComponentOptionsMixin, ComponentOptionsMixin, {}, string, PublicProps, Readonly<ExtractPropTypes<{}>>, {}>;
-}
-
-const routes: RouteDefinition = {
-  '/home': Home,
-  '/plan': Plan
-}
-
-const currentPath = ref(window.location.hash)
-
-window.addEventListener('hashchange', () => {
-  currentPath.value = window.location.hash
-})
-
-const currentView = computed(() => {
-  return routes[currentPath.value.slice(1) || '/'];
-});
+import '@syncfusion/ej2-base/styles/material.css'
+import '@syncfusion/ej2-buttons/styles/material.css'
+import '@syncfusion/ej2-calendars/styles/material.css'
+import '@syncfusion/ej2-dropdowns/styles/material.css'
+import '@syncfusion/ej2-inputs/styles/material.css'
+import '@syncfusion/ej2-navigations/styles/material.css'
+import '@syncfusion/ej2-popups/styles/material.css'
+import '@syncfusion/ej2-splitbuttons/styles/material.css'
+import '@syncfusion/ej2-vue-grids/styles/material.css'
+import { GridComponent as EjsGrid, ColumnsDirective as EColumns, ColumnDirective as EColumn } from '@syncfusion/ej2-vue-grids';
 </script>
 
 <template>
-  <div class="homebar">
-    <ul>
-        <li><a href="#/home">Overview</a></li>
-        <li><a href="#transaction">Transaction</a></li>
-        <li><a href="#investment">Investment</a></li>
-        <li><a href="#/plan">Plan</a></li>
-        <li><a href="#report">Report</a></li>
-    </ul>
-  </div>
-  <component :is="currentView" />
+  <router-view/>
+  <router-link to="/home">Overview</router-link>
+  <router-link to="/transaction">Transaction</router-link>
+  <router-link to="/plan">Plan</router-link>
+  <router-link to="/report">Report</router-link>
+  <router-link to="/profile">Profile</router-link>
 </template>
+
 
 
