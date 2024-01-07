@@ -40,6 +40,6 @@ const axiosInstance = axios.create({
 app.config.globalProperties.$axios = axiosInstance;
 
 app.use(router);
-app..component('font-awesome-icon', FontAwesomeIcon).mount('#app');
+app.component('font-awesome-icon', FontAwesomeIcon).mount('#app');
 // const store = new Store();
 // app.whenReady().then(createWindow);
