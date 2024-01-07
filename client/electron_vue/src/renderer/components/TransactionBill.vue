@@ -29,7 +29,7 @@ onMounted(async () => {
     <h1 class="font-semibold text-lg text-left ps-5 pb-5">Upcoming Bills</h1>
    
     <div class="  justify-center gap-4 h-44 carousel rounded-box w-full">
-    <div class="carousel-item bg-indigo-800 w-full">
+    <div class="carousel-item w-full bg-indigo-700">
         <!-- Use v-for to loop through a range (0 to 3) and create a card for each iteration -->
       <Card
         v-for="(bill, index) in billData"
@@ -41,13 +41,13 @@ onMounted(async () => {
     
         <div class="relative z-10 flex flex-col" v-if="bill.recurrent_reminder==true" > <!-- Place text inside a relative container -->
            
-            <CardHeader class=" text-ellipsis  font-semibold text-left h:1/2">   
+            <CardHeader class=" text-ellipsis text-xl font-semibold text-left h:1/2 text-indigo-800">   
                 {{bill.bill_name}}
                 <Separator/>
-            <CardTitle class="text-black font-bolder text-xs overflow-hidden text-ellipsis hover:underline ">
+            <CardTitle class="text-black font-bolder text-sm overflow-hidden text-ellipsis hover:underline ">
               <a :href="bill.bill_url" target="_blank" rel="noopener noreferrer" class="p-0">{{bill.recurrent_date_value}}  </a>
             </CardTitle>
-            <CardDescription class="text-black text-xs">
+            <CardDescription class="text-black text-lg">
            $ {{bill.bill_value}}
             </CardDescription>
         </CardHeader>

@@ -84,7 +84,7 @@ const table = useVueTable({
         </div>
     <div class="border rounded-md">
         <Table>
-            <TableHeader class="bg-indigo-800 text-ingdigo-950 ">
+            <TableHeader class="bg-indigo-700 text-ingdigo-950 ">
                 <TableRow  v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
                     <TableHead class="text-white " v-for="header in headerGroup.headers" :key="header.id">
                         <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header"

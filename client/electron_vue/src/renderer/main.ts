@@ -11,7 +11,17 @@ import router from './router/router';
 // Your routes and other middleware
 
 
+/* import the fontawesome core */
+import { library } from '@fortawesome/fontawesome-svg-core'
 
+/* import font awesome icon component */
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+/* import specific icons */
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+
+/* add icons to the library */
+library.add(faUserSecret)
 
 const app = createApp(App);
 
@@ -30,6 +40,6 @@ const axiosInstance = axios.create({
 app.config.globalProperties.$axios = axiosInstance;
 
 app.use(router);
-app.mount('#app');
+app..component('font-awesome-icon', FontAwesomeIcon).mount('#app');
 // const store = new Store();
 // app.whenReady().then(createWindow);

@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { columns } from "./TransactionTable/columns"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../../@/components/ui/popover';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { columns } from "./TransactionTable/columns";
 import type { Payment } from './TransactionTable/columns';
 import DataTable from "./TransactionTable/DataTable.vue"
 import { Button } from '../../@/components/ui/Button'
+import TransactionForm from './TransactionForm.vue';
 const data = ref<Payment[]>([])
 const user_id = localStorage.getItem('userId') ?? '';
 
@@ -38,6 +44,7 @@ console.log(response.data);
       date: backendTransaction.transaction_date,
       payee: backendTransaction.Payee,
       categories: backendTransaction.category,
+      type: backendTransaction.transaction_type,
     }));
 
     console.log('Mapped data from backend:', mappedData);
@@ -61,9 +68,13 @@ onMounted(async () => {
   <header class="  pt-6 pb-0 border-t ps-5  flex items-center w-full ">
     
     <h1 class="font-semibold text-lg w-full flex items-center "><span class="w-max">Transaction History</span>
-        <Button class="w-6 h-6 p-0 ms-4 bg-indigo-700 align-middle">
-         +
-          </Button>
+
+  <Popover >
+    <PopoverTrigger class="w-6 h-6 p-0 ms-4 bg-indigo-700 align-middle text-white rounded-sm flex justify-center items-center">
+    +
+    </PopoverTrigger>
+  <PopoverContent class="w-full"> <TransactionForm/></PopoverContent>  
+  </Popover>
     </h1></header>
   <div class="container pb-8 mx-auto ">
     <DataTable :columns="columns" :data="data" />

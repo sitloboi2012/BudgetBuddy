@@ -6,12 +6,20 @@ import { Button } from '../../../@/components/ui/button'
 
 defineProps<{
   payment: {
-    id: string
+    id: string,
+    amount: number,
+    account: string,
+    transactionName: string,
+    date: string,
+    payee: string,
+    categories: string,
+type: string;
   }
 }>()
 
-function copy(id: string) {
-  navigator.clipboard.writeText(id)
+function copy( account: string, amount: number, transactionName: string, date: string, payee: string, categories: string, type: string) {
+  navigator.clipboard.writeText(`Account: ${account}, Amount: ${amount}, Transaction name:  ${transactionName}, Date: ${date}, Payee: ${payee}, Category: ${categories}`);
+
 }
 </script>
 
@@ -25,8 +33,8 @@ function copy(id: string) {
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-      <DropdownMenuItem @click="copy(payment.id)">
-        Copy transaction ID
+      <DropdownMenuItem @click="() => copy( payment.account, payment.amount, payment.transactionName, payment.date, payment.payee, payment.categories, payment.type)">
+        Copy transaction Detail
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem>Edit Transaction</DropdownMenuItem>

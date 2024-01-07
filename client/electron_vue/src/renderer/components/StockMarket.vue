@@ -7,6 +7,7 @@ const originalStocks = ref([]);
 const activeButton = ref('hot');
 
 const setActiveButton = (button) => {
+  stocks.value = originalStocks.value;
   activeButton.value = button;
   console.log(activeButton.value);
 };
