@@ -38,11 +38,11 @@
         type="password"
         v-model="keyInput" />
   
-        <button type="submit" style="text-align: center;">Log In</button>
-        <div class="social">
+        <button class="justify-center" type="submit" style="text-align: center;">Log In</button>
+        <!-- <div class="social">
           <div class="go"><i class="fab fa-google"></i> Google</div>
           <div class="fb"><i class="fab fa-facebook"></i> Facebook</div>
-        </div>
+        </div> -->
   
         <p class="m-auto mt-3 text-center fst-italic">
           <router-link to="/register" class="text-decoration-none">
