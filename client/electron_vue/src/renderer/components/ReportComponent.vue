@@ -259,9 +259,40 @@ const forecastChartData = ref({
   ],
 });
 
+
 const forecastChartOptions = ref({
   responsive: true,
-  // ... other options ...
+  plugins: {
+    title: {
+      display: true,
+      text: 'Forecast Overall Chart',
+      font: {
+        size: 14,
+      },
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Days in a Month',
+        font: {
+          size: 12,
+        },
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Final Budget Per Day',
+        font: {
+          size: 12,
+        },
+      },
+    },
+  },
+ // Set to false to allow custom width and height
+ // Set your desired height
 });
 onMounted(fetchForecastData);
 </script>
