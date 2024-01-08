@@ -345,8 +345,8 @@ onMounted(fetchForecastData);
   </Select>
   <div class="desc w-full text-left pt-4 "><p class="text-black text-xl font-semibold"><span class="text-indigo-800">{{ selectedMonthName }}</span> cost against budget</p></div>
     </div>
-        <div class="bg-white text-sm text-gray-950 leading-none border-2 border-gray-200 rounded-full inline-flex mt-4">
-    <button @click="toggleButton('budget')" :class="{ 'active': activeButton === 'budget' }" class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:text-indigo-800 focus:text-indigo-800 rounded-l-full px-4 py-2" id="grid">
+        <div class="bg-white text-sm text-gray-950 leading-none border-2 border-gray-200 rounded-full inline-flex mt-4 w-full  ">
+    <button @click="toggleButton('budget')" :class="{ 'active': activeButton === 'budget' }" class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:text-indigo-800 focus:text-indigo-800 rounded-l-full px-4 py-2 w-1/2" id="grid">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fill-current w-4 h-4 mr-2">
         <rect x="3" y="3" width="7" height="7"></rect>
         <rect x="14" y="3" width="7" height="7"></rect>
@@ -355,7 +355,7 @@ onMounted(fetchForecastData);
       </svg>
       <span>Budget</span>
     </button>
-    <button @click="toggleButton('forecast')" :class="{ 'active': activeButton === 'forecast' }" class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:text-black focus:text-indigo-50 rounded-r-full px-4 py-2" id="list">
+    <button @click="toggleButton('forecast')" :class="{ 'active': activeButton === 'forecast' }" class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:text-black focus:text-indigo-50 rounded-r-full px-4 py-2 w-1/2" id="list">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fill-current w-4 h-4 mr-2">
         <line x1="8" y1="6" x2="21" y2="6"></line>
         <line x1="8" y1="12" x2="21" y2="12"></line>
