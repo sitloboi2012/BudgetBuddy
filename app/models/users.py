@@ -43,4 +43,3 @@ class UserInfo(BaseModel):
         if any(char.isspace() or not char.isalnum() for char in v):
             raise ValueError("Username should not contain spaces or special characters.")
         return v
-    
