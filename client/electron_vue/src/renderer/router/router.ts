@@ -4,6 +4,7 @@ import Home from '../views/Homepage.vue';
 import Plan from '../views/Plan.vue';
 import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
+import Profile from '../views/Profile.vue';
 import Investment from '../views/Investment.vue';
 import Report from '../views/Report.vue';
 import Transaction from '../views/Transaction.vue';
@@ -16,7 +17,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/register', name: 'Register',component: Register },
   { path: '/investment',name: 'Investment', component: Investment, meta: { requiresAuth: true }},
   { path: '/report',name:'Report', component: Report , meta: { requiresAuth: true }},
-  { path: '/transaction',name:'Transaction', component: Transaction , meta: { requiresAuth: true }}
+  { path: '/transaction',name:'Transaction', component: Transaction , meta: { requiresAuth: true }},
+  { path: '/profile', name:'Profile',component: Profile ,meta: { requiresAuth: true }},
   // Add more routes as needed
 ];
 

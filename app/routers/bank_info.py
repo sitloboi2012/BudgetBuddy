@@ -5,7 +5,9 @@ from fastapi.responses import JSONResponse
 from constant import BANK_INFO
 from models.bank_info import BankInfo, ListOfBankInfo
 
+
 router = APIRouter(prefix="/api/v1", tags=["Banking Data Info"])
+
 
 @router.get("/get_bank_data")
 def get_bank_data():

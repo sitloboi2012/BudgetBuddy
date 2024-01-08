@@ -1,15 +1,16 @@
+
 <template>
   <section class="networth">
-    <div class="total flex">
-      <p class="label text-left ">Networth</p>
-      <h2 class="label w-full text-right">$ {{ totalNetworth }}</h2>
+    <div class="total">
+      <p class="label">Networth</p>
+      <h2 class="label">{{ totalNetworth }}</h2>
     </div>
     <div class="networth_container">
       <article class="bank_acc">
         <div v-for="accountType in uniqueAccountTypes" :key="accountType">
           <button @click="toggleAccountType(accountType)">
             <p>{{ accountType }}</p>
-            <p> ${{ getSumOfAccount(accountType) }}</p>
+            <p>{{ getSumOfAccount(accountType) }}</p>
           </button>
           <div v-if="selectedAccountTypes.includes(accountType)">
             <div v-for="account in getAccountsByType(accountType)" :key="account[0]" class="flex justify-between">
@@ -29,7 +30,7 @@
 import { ref, defineEmits, onMounted, computed } from 'vue';
 import axios from 'axios';
 
-const user_id = localStorage.getItem('userId') ?? '';
+const user_id = '657deedb53a90ee98e224654';
 const userAccounts = ref([]);
 const selectedAccountTypes = ref([]);
 
@@ -37,7 +38,6 @@ const fetchBankAccount = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/api/v1/${user_id}`);
     userAccounts.value = response.data.list_account_name;
-    console.log(response.data)
   } catch (error) {
     console.error('Error fetching account information:', error);
   }

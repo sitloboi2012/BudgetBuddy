@@ -9,6 +9,10 @@ module.exports = {
     './components/**/*.{ts,tsx,vue}',
     './app/**/*.{ts,tsx,vue}',
     './src/**/*.{ts,tsx,vue}',
+    './index.html',
+  './src/**/*.{vue,js,ts,jsx,tsx}',
+  'node_modules/flowbite-vue/**/*.{js,jsx,ts,tsx,vue}',
+  'node_modules/flowbite/**/*.{js,jsx,ts,tsx}'
 	],
   
   theme: {
@@ -87,4 +91,18 @@ module.exports = {
     },
   },
   plugins: [animate,require('daisyui')],
+  plugins: [
+    require('flowbite/plugin')({
+      charts: true,
+    }),
+  ],
+  purge: ["./src/**/**.{vue,html,js}",
+        "./App.vue"
+  ],
+  theme: {
+    extend: {},
+  },
+  purge: ["./src/**/**.{vue,html,js}",
+  "./App.vue"
+],
 }
