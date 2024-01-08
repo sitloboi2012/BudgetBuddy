@@ -37,7 +37,7 @@ function copy( account: string, amount: number, transactionName: string, date: s
         Copy transaction Detail
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>Edit Transaction</DropdownMenuItem>
+     
       <DropdownMenuItem>Delete Transaction</DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>

@@ -12,12 +12,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../@/components/ui/select'
-import {   ref, watch,  computed, reactive, nextTick} from 'vue'
+import {   ref, watch,  computed, reactive, nextTick, onMounted} from 'vue'
 import axios from 'axios'
-import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale} from 'chart.js'
+import { Bar, Line } from 'vue-chartjs'
+import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, PointElement, LineElement, CategoryScale, LinearScale } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale,  PointElement,
+  LineElement)
+
+
+const updateTrigger = reactive({
+  forceUpdate: 0,
+});
+
+const methodThatForcesUpdate = () => {
+  updateTrigger.forceUpdate += 1;
+ 
+};
+
+const randomColor = () => {
+  // Generate a random hex color code
+  return '#' + Math.floor(Math.random()*16777215).toString(16);
+};
 
 const userName = ref<string | null>(null);
 const year = ref(2023);
@@ -28,15 +44,15 @@ const previousTransactions = ref([]);
 const percentageChange = ref(0);
 const finalBudget = ref(0);
 const finalBudgetPerDay = ref([]);
+const forecastData = ref([]);
 
 
-const activeButton = ref('budget');
 
-
+const activeButton = ref('forecast');
 
 const toggleButton = (button: string) => {
   console.log(button);
-  activeButton.value = activeButton.value === button ? null : button;
+  activeButton.value = activeButton.value !== button ? button : null;
 };
 
 
@@ -95,7 +111,9 @@ return budget;
 };
 
 const calculateFinalBudgetPerDay = (transactionData) => {
-  const daysInMonth = new Date(year.value, selectedMonth.value, 0).getDate();
+  const month  = parseInt(selectedMonth.value) - 1;
+  console.log('Month afeter -1',month)
+  const daysInMonth = new Date(year.value, month, 0).getDate();
   const dailyBudget = Array.from({ length: daysInMonth }, (_, i) => {
     const day = (i + 1).toString().padStart(2, '0');
     const dailyTransactions = transactionData.filter(transaction => transaction.transaction_date.endsWith(`-${day}`));
@@ -129,13 +147,16 @@ console.log('Watch final daily budget', finalBudgetPerDay.value);
   const prevMonth = String(Number(selectedMonth.value) - 1).padStart(2, '0');
   const prevYear = String(year.value);
   fetchPreviousData(prevMonth, prevYear);
-  
+  chartData.value.datasets[0].backgroundColor = finalBudgetPerDay.value.map(() => randomColor()) as any[];
+
+  methodThatForcesUpdate()
  
 });
 watch([selectedMonth, year], ([newSelectedMonth, newYear]) => {
     chartData.value.labels = generateDateLabels(newYear, newSelectedMonth);
     console.log('Watch', chartData.value.labels);
   fetchData(newSelectedMonth, newYear.toString());
+  
 });
 
 const selectedMonthName = computed(() => {
@@ -160,18 +181,89 @@ const generateDateLabels = (year, month) => {
   return labels;
 };
 const chartData = ref({
-    labels: generateDateLabels(year.value, selectedMonth.value),
-  datasets: [{ data: [40, 20, 12] }],
+  labels: generateDateLabels(year.value, selectedMonth.value),
+  datasets: [
+    {
+      data: [],
+      backgroundColor: [],
+       // Array to hold random colors for each bar
+    },
+  ],
 });
+
+const fetchForecastData = async () => {
+  try {
+
+
+    // Fetch forecast data
+    const forecastResponse = await axios.get(`http://localhost:8080/api/v1/prediction/${user_id}`, {
+      withCredentials: true,
+    });
+    // Handle the forecast data here
+    forecastData.value = forecastResponse.data;
+    console.log('Forecast Data:', forecastData.value);
+    forecastChartData.value.datasets[0].data = forecastResponse.data;
+    console.log(forecastChartData.value)
+    methodThatForcesUpdate()
+    return forecastData.value;
+  } catch (error) {
+    // ... existing code ...
+  }
+};
+
 
 
 const chartOptions = ref({
   responsive: true,
+  plugins: {
+    title: {
+      display: true,
+      text: 'Monthly Overall Chart',
+      font: {
+        size: 14,
+      },
+    },
+  },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Days in a Month',
+        font: {
+          size: 12,
+        },
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Final Budget Per Day',
+        font: {
+          size: 12,
+        },
+      },
+    },
+  },
+ // Set to false to allow custom width and height
+ // Set your desired height
 });
 
+const forecastChartData = ref({
+  labels: Array.from({ length: 94 }, (_, i) => (i + 1).toString()),
+  datasets: [
+    {
+      data: fetchForecastData,
+      borderColor: 'rgba(49, 156, 87, 1)', // Adjust color as needed
+      borderWidth: 2,
+    },
+  ],
+});
 
-
-
+const forecastChartOptions = ref({
+  responsive: true,
+  // ... other options ...
+});
+onMounted(fetchForecastData);
 </script>
 
 <template>
@@ -244,13 +336,26 @@ const chartOptions = ref({
       <span>Forecast</span>
     </button>
   </div>
-<div class="pt-4">
+<div class="pt-4 flex items-center justify-center ">
     <Bar
-   
+    v-if="activeButton === 'budget'"
+    :key="updateTrigger.forceUpdate"
     id="my-chart-id"
     :options="chartOptions"
     :data="chartData"  
+    class="w-full h-full"
+    width="50px" height="40px"
   >Chart could not be load</Bar>
+  <Line
+      v-if="activeButton === 'forecast'"
+      :key="updateTrigger.forceUpdate"
+      id="forecast-chart-id"
+      :options="forecastChartOptions"
+      :data="forecastChartData"
+      class="w-full h-full"
+      width="50px"
+      height="40px"
+    >Forecast Chart could not be load</Line>
   </div>
   </div>
   <div class="overall-badge pe-8 py-5 pt-10 col-span-2 h-full ">
