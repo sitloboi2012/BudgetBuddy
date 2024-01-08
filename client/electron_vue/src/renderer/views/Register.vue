@@ -250,7 +250,7 @@ body {
   
   form {
     height: max-content;
-    width: 400px;
+    width: 700px;
     background-color: rgba(107, 95, 197, 0.5);
     position: absolute;
     transform: translate(-80%, -50%);

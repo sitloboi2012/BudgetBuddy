@@ -90,19 +90,18 @@ module.exports = {
       },
     },
   },
-  plugins: [animate,require('daisyui')],
-  plugins: [
-    require('flowbite/plugin')({
-      charts: true,
-    }),
-  ],
-  purge: ["./src/**/**.{vue,html,js}",
-        "./App.vue"
-  ],
-  theme: {
-    extend: {},
-  },
-  purge: ["./src/**/**.{vue,html,js}",
-  "./App.vue"
+  plugins: [animate,require('daisyui'), require('flowbite/plugin')({charts: true,})
 ],
+  // plugins: [animate,
+  //   require('flowbite/plugin', 'daisyui')({
+  //     charts: true,
+  //   }),
+  // ],
+  // purge: ["./src/**/**.{vue,html,js}",
+  //       "./App.vue"
+  // ],
+
+//   purge: ["./src/**/**.{vue,html,js}",
+//   "./App.vue"
+// ],
 }
