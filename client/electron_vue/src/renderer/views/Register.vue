@@ -2,104 +2,103 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { ref, reactive} from 'vue';
+import router from '../router/router';
 
-const user_name = ref('');
-const full_name = ref('');
-const email = ref('');
-const number = ref('');
-const address = ref('');
-const password = ref('');
-const repassword = ref('');
+const state = reactive({
+  full_name: ref(''),
+  user_name: ref(''),
+  password: ref(''),
+  repassword: ref(''),
+  address: ref(''),
+  number: ref(''),
+  email: ref(''),
+});
 
-const state = {
-  use_name: {
-    value: '',
-    error: '',
-  },
-  full_ame: {
-    value: '',
-    error: '',
-  },
-  email: {
-    value: '',
-    error: '',
-  },
-  number: {
-    value: '',
-    error: '',
-  },
-  address: {
-    value: '',
-    error: '',
-  },
-  password: {
-    value: '',
-    error: '',
-  },
-  repassword: {
-    value: '',
-    error: '',
-  },
+const displayErrorMessage = (message: string, inputName: string) => {
+  const inputElement = document.querySelector(`[name=${inputName}]`);
+  console.log(inputElement)
+  if (inputElement) {
+    inputElement.style.border = '2px solid pink';
+    
+    const errorMessage = document.createElement('p');
+    errorMessage.className = 'error-message';
+    errorMessage.textContent = message;
+    errorMessage.setAttribute('name', inputName); // Set the name attribute
+    inputElement.parentNode.insertBefore(errorMessage, inputElement.nextSibling);
+  }
 };
 
+const clearErrorStyles = () => {
+  for (const field in state) {
+    const inputElement = document.querySelector(`[name=${field}]`);
+    if (inputElement) {
+      inputElement.style.border = '1px solid #ccc';
+      console.log('Cleared')
+    }
 
-const validateEmail = () => {
+    const errorMessage = document.querySelector(`p.error-message[name=${field}]`);
+    if (errorMessage) {
+      errorMessage.remove();
+      console.log('errror msg removed')
+    }
+  }
+};
+const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(state.email.value)) {
-    state.email.error = 'Invalid email address';
-    return false;
-  } else {
-    state.email.error = '';
-    return true;
-  }
+  return emailRegex.test(email);
+};
+const validateNumber = (number) => {
+  const numberRegex = /^[\d\-() ]+$/;
+  return numberRegex.test(number);
 };
 
-const validateNumber = () => {
-  const numberRegex = /^\d+$/;
-  if (!numberRegex.test(state.number.value)) {
-    state.number.error = 'Invalid phone number';
-    return false;
-  } else {
-    state.number.error = '';
-    return true;
-  }
-};
-const validatePasswordMatch = () => {
-  if (state.password.value !== state.repassword.value) {
-    state.repassword.error = 'Passwords do not match';
-    return false;
-  } else {
-    state.repassword.error = '';
-    return true;
-  }
-};
+
+
   
 const register = async () => {
-  for (const field in state) {
-    state[field].error = '';
-  }
+  const errors = []
+
+  console.log(state.email)
+clearErrorStyles()
   // Validate email, number, and password match
-  const isEmailValid = validateEmail();
-  const isNumberValid = validateNumber();
-  const isPasswordMatchValid = validatePasswordMatch();
+
 
   // Check if there are any validation errors
-  if (!isEmailValid || !isNumberValid || !isPasswordMatchValid) {
-    // Handle validation errors, e.g., show error messages and add red border
-    console.log('Form validation failed');
-    return;
-  }
+ if (!validateNumber(state.number)) {
+  errors.push("Invalid Phone Numner");
+  displayErrorMessage(
+            "Invalid Phone Number",
+            "number"
+          );
+
+ }
+ if (!validateEmail(state.email)) {
+  errors.push("Invalid Email");
+  displayErrorMessage(
+            "Enter a valid email",
+            "email"
+          );
+
+ }
+ if (state.password != state.repassword) {
+          errors.push("Passwords do not match");
+          displayErrorMessage("Password does not match", "repassword");
+        }
+
+        if (errors.length > 0) {
+          return;
+        }
+
   // Create a FormData object to send form data
   const formData = new FormData();
-  formData.append('user_name', user_name.value);
-  formData.append('password', password.value);
-  formData.append('full_Name', full_name.value);
-  formData.append('number', number.value);
-  formData.append('email', email.value);
+  formData.append('user_name', state.user_name);
+  formData.append('password',state.password);
+  formData.append('full_name', state.full_name);
+  formData.append('number', state.number);
+  formData.append('email', state.email);
+formData.append('address', state.address);
 
-  formData.append('address', address.value);
-
-console.log(formData)
+// console.log(state.user_name,state.password, state.full_name ,state.number, state.email,state.address)
 
   try {
     const response = await axios.post('http://localhost:8080/api/v1/register', formData, {
@@ -111,9 +110,13 @@ console.log(formData)
 
     // Handle successful registration
     console.log('Registration successful!', response.data);
+    alert('Registration Successful!. Please sign in with the authentication key sent in your email account.')
+    router.push({ name: 'Login' });
   } catch (error) {
+    if (error.response && error.response.status === 409) {
+      alert('Email account or username already exist!')}
     // Handle registration error
-    console.error('Registration failed:', error.message);
+    console.error('Registration failed:', error.message, );
   }
 };
 </script>
@@ -132,10 +135,10 @@ console.log(formData)
         <input
           required
           type="text"
-          placeholder="user_name"
+          placeholder="Username"
           id="user_name"
           name="user_name"
-          v-model="user_name"
+          v-model="state.user_name"
         /></div>
         <div class="form-input"><label for="full_name">Full Name *</label>
       <input
@@ -143,28 +146,28 @@ console.log(formData)
         type="text"
         placeholder="Full Name"
         id="full_name"
-        v-model="full_Name"
+        v-model="state.full_name"
       /></div> 
         
       
         
         <div class="form-input">  <label for="number">Phone Number</label>
       <input
-       
+       name="number"
         type="text"
         placeholder="Phone Number"
         id="number"
-        v-model="number"
+        v-model="state.number"
       />
-      <span v-if="state.phone.error" class="error-message">{{ state.phone.error }}</span>
+      <!-- <span v-if="state.number.error" class="error-message">{{ state.number.error }}</span> -->
 </div>
 <div class="form-input"><label for="address">Address</label>
       <input
-       
+       name="address"
         type="text"
         placeholder="Address"
         id="address"
-        v-model="address"
+        v-model="state.address"
       /> </div>
       
       <div class="form-input">  <label for="password">Password *</label>
@@ -174,7 +177,7 @@ console.log(formData)
           placeholder="Password"
           id="password"
           name="password"
-          v-model="password"
+          v-model="state.password"
         />
   </div> 
    <div class="form-input"> <label for="repassword">Re-enter Password *</label>
@@ -184,20 +187,20 @@ console.log(formData)
           placeholder="Re-enter Password"
           id="repassword"
           name="repassword"
-          v-model="repassword"
+          v-model="state.repassword"
         /> 
-        <span v-if="state.repassword.error" class="error-message">{{ state.repassword.error }}</span>
+        <!-- <span v-if="state.repassword.error" class="error-message">{{ state.repassword.error }}</span> -->
       </div>
         <div class="form-input  col-span-2"><label for="email">Email *</label>
         <input
           required
-          type="email"
+          type=""
           placeholder="Email"
           id="email"
           name="email"
-          v-model="email"
+          v-model="state.email"
         />
-        <span v-if="state.email.error" class="error-message">{{ state.email.error }}</span>
+        <!-- <span v-if="state.email.error" class="error-message">{{ state.email.error }}</span> -->
         <p class="text-sm italic pt-3"> Enter valid email to recieve authentication key </p>
       </div>
        
