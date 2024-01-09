@@ -10,14 +10,14 @@
         <div>
           <fwb-input
             v-model="user_address"
-            placeholder="enter your address"
+            placeholder="Enter your address"
             label="Address"
             class="p-2"
           />
           <fwb-input
             v-model="num"
-            placeholder="enter your phone number"
-            label="Phonenum"
+            placeholder="Enter your phone number"
+            label="Phone number"
             class="p-2"
           />
           <div class="flex justify-between p-2">

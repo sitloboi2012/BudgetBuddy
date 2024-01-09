@@ -11,7 +11,7 @@
           <p>{{ profile.full_name }}</p>
         </div>
         <div class="info number">
-          <h2>Phone num</h2>
+          <h2>Phone number</h2>
           <p>{{ profile.number }}</p>
         </div>
         <div class="info dc">

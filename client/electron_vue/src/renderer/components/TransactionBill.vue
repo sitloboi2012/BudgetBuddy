@@ -91,8 +91,8 @@ onMounted(async () => {
        
       >
       <div class="relative">
-      <button  @click="toggleReminderOptions(bill.bill_id)" class="text-xl p-0 text-right w-full ps-40 font-bold" >...</button>
-      <div @click="turnOffReminder" v-if="showReminderOptions && selectedBillId === bill.bill_id" class="z-40 bg-indigo-700 rounded-lg w-max px-3 py-2 absolute text-white shadow-xl top-6 right-0 " id="${bill.bill_id}"> Turn off reminder</div></div>
+      <Button  @click="toggleReminderOptions(bill.bill_id)" class="text-xl  text-right font-bold text-indigo-800 pe-2 w-full " >...</Button>
+      <div @click="turnOffReminder" v-if="showReminderOptions && selectedBillId === bill.bill_id" class="z-40 bg-indigo-700 rounded-lg w-full text-xs px-3 py-2 absolute text-white shadow-xl top-6 right-0 " id="${bill.bill_id}"> Turn off reminder</div></div>
         <div class="relative z-10 flex flex-col" v-if="bill.recurrent_reminder==true" > <!-- Place text inside a relative container -->
            
             <CardHeader class=" text-ellipsis text-xl font-semibold text-left h:1/2 text-indigo-800 px-4 py-0">   
