@@ -8,9 +8,9 @@
         </template>
         <template #body>
           <div>
-            <fwb-input
+            <fwb-select
               v-model="category"
-              placeholder="enter your category name"
+              :options="available"
               label="Category"
               class="p-2"
             />
@@ -45,8 +45,18 @@
   import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
   import axios from 'axios';
   
-  const user_id = '657deedb53a90ee98e224654';
+  const user_id = localStorage.getItem('userId') ?? '';
   const category = ref('');
+  const available = [
+  { value: 'Housing', name: 'Housing' },
+  { value: 'Transportation', name: 'Transportation' },
+  { value: 'Groceries', name: 'Groceries' },
+  { value: 'Entertainment', name: 'Entertainment' },
+  { value: 'Food & Dining', name: 'Food & Dining' },
+  { value: 'Health & Fitness', name: 'Health & Fitness' },
+  { value: 'Debt & Loans', name: 'Debt & Loans' },
+  { value: 'Education', name: 'Education' },
+]
   const initialamount = ref('');
   const time = ref('');
   

@@ -73,7 +73,7 @@ import { ref, defineEmits } from 'vue';
 import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
 import axios from 'axios';
 
-const user_id = '657deedb53a90ee98e224654';
+const user_id = localStorage.getItem('userId') ?? '';
 const youraccount = ref('');
 const balance = ref('');
 const accountbank = ref('');

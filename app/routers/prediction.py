@@ -42,7 +42,7 @@ def income_prediction(user_id:str):
                 headers = ['transaction_date', 'Amount']    
                 df = df[headers]    
                 df = df.groupby('transaction_date').sum().reset_index()
-                df['transaction_date'] = pd.to_datetime(df['transaction_date'], dayfirst=True)
+                df['transaction_date'] = pd.to_datetime(df['transaction_date'])
                 df = df.set_index('transaction_date')
                 df = df.sort_index()
                 return df

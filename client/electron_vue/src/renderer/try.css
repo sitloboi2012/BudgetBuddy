@@ -106,11 +106,11 @@ top: 60px;
 }
 
 .screen{
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(249, 251, 254);
   position: absolute;
   left: 372px;
   top: 80px;
-  width: 60%;
+  width: 66%;
   height: 86%;
   border-radius: 20px;
   overflow: hidden;

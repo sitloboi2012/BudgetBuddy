@@ -24,7 +24,7 @@
     import { ref, defineEmits, onMounted, computed } from 'vue';
     import axios from 'axios';
 
-    const user_id = '6593ccdf025b256e0ffe24e8';
+    const user_id = localStorage.getItem('userId') ?? '';
     const allAccounts = ref([]);
     let editData = ref(null)
 

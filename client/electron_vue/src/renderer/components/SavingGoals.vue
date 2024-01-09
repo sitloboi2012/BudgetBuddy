@@ -4,10 +4,17 @@
         <button>
             <div class="flex space-between">
             <h1 class="flex-1" :style="{fontSize: '20px'}">{{ goal.goal_name }}</h1>
-            <p class="flex-1" @click="clickEdit(goal)">:</p>
-            <p class="flex-1" @click="clickDelete(goal.id)">d</p>
+            <p class="flex-1" @click="clickEdit(goal)">edit</p>
+            <p class="flex-1" @click="clickDelete(goal.id)">delete</p>
             </div>
-            <h2 :style="{fontSize: '20px', paddingBottom: '20px'}">${{ goal.current_balance || 0}} saved so far</h2>
+            <h2 :style="{fontSize: '12px',paddingTop:'20px', paddingBottom: '5px', color:'grey'}">${{ goal.current_balance || 0}} saved so far</h2>
+            <fwb-progress
+                  :progress="roundedProgress(goal.current_balance, goal.saving_amount)"
+                  label-position="inside"
+                  label-progress
+                  size="xl"
+                  class="chart"
+                />
             <div class="details">    
                 <div class="left-column">
                     <p>saved</p>
@@ -28,6 +35,7 @@
 
 <script setup lang="ts">
     import { ref, defineEmits, onMounted } from 'vue';
+    import { FwbProgress } from 'flowbite-vue'
     import axios from 'axios';
     
     const user_id = '6593ccdf025b256e0ffe24e8';
@@ -73,6 +81,9 @@
 
         const addGoal = () => {
         emits('add-goal');
+        };
+        const roundedProgress = (currentTotalUse, initialAmount) => {
+        return Math.ceil((currentTotalUse / initialAmount) * 100);
         };
 </script>
 
@@ -125,4 +136,9 @@ padding-top: 3px;
 .right-column p {
   margin: 0;
 }
+.chart{
+        border: 1px solid #ddd;
+        width:90%;
+        background-color: white;
+    }
 </style>

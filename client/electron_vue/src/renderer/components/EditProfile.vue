@@ -39,7 +39,7 @@ import { ref, defineEmits, onMounted, toRefs } from 'vue';
 import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
 import axios from 'axios';
 
-const user_id = '657deedb53a90ee98e224654';
+const user_id = localStorage.getItem('userId') ?? '';
 let { data } = defineProps(['data']);
 let info= toRefs(data);
 let pass = ref(info[0])
@@ -80,7 +80,7 @@ async function editPro() {
     });
 
     console.log('check:', response.data);
-    closeModal();
+
 
     // Handle success or update UI accordingly
   } catch (error) {

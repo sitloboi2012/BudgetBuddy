@@ -2,19 +2,19 @@
         <div class="plan-income">
         <article class="plann" v-for="plan in monthlyExpensePlans" :key="plan" @click="clickView(plan)">
             <button>
-              <div class='ti flex space-between'>  
-                <h1 :style="{fontSize: '20px'}" class='flex-1'>{{ plan.category }}</h1>
-                <h1 :style="{fontSize: '20px'}" class='flex-1' @click="clickDelete(plan.id)">Delete</h1>
+              <div class='ti flex'>  
+                <h1 :style="{fontSize: '20px', paddingRight: '70px'}" class='flex-1'>{{ plan.category }}</h1>
+                <h1 :style="{fontSize: '25px', color:'blue'}" class='flex-1' @click="clickDelete(plan.id)">-</h1>
               </div>
-                <p :style="{fontSize: '13px', paddingBottom: '20px'}">{{ plan.current_total_use }} spent</p>
+                <p :style="{fontSize: '13px',paddingTop:'20px', paddingBottom: '5px', color:'gray'}">{{ plan.current_total_use }} spent</p>
                 <fwb-progress
-                  :progress="50"
+                  :progress="roundedProgress(plan.current_total_use, plan.initial_amount)"
                   label-position="inside"
                   label-progress
                   size="xl"
                   class="chart"
                 />
-                <p :style="{fontSize: '13px', paddingBottom: '20px'}">of {{ plan.initial_amount }}</p>
+                <p :style="{fontSize: '13px', paddingTop:'5px', paddingBottom: '20px', color:'gray'}">of {{ plan.initial_amount }}</p>
                 <h2 :style="{fontSize: '20px'}">$ {{ plan.initial_amount - plan.current_total_use }} left</h2>
             </button>
         </article>
@@ -30,7 +30,7 @@ import { ref, defineEmits, onMounted, computed } from 'vue';
 import { FwbProgress } from 'flowbite-vue'
 import axios from 'axios';
 
-const user_id = '6593ccdf025b256e0ffe24e8';
+const user_id = localStorage.getItem('userId') ?? '';
 const monthlyExpensePlans = ref([]);
 let viewData = ref(null)
 let deleteId = ref(null)
@@ -71,6 +71,9 @@ const emits = defineEmits(['add-plan', 'view-plan']);
 const addPlan = () => {
   emits('add-plan');
 };
+const roundedProgress = (currentTotalUse, initialAmount) => {
+  return Math.ceil((currentTotalUse / initialAmount) * 100);
+};
 
 </script>
 
@@ -94,13 +97,14 @@ const addPlan = () => {
     margin: 7px auto;
 }
 .addplan {
-    background-color: rgb(145, 145, 175);
+    background-color: rgba(189, 189, 189, 0.58);
     border-radius: 10px;
     padding: 10px;
     width: 48%;
-    height: 150px;
+    height: 190px;
     float: left;
     margin: 7px auto;
+    align-content: center;
 }
 
 button {
@@ -115,7 +119,9 @@ button {
         width:90%;
         background-color: white;
     }
-.ti{
-  width: 98%
+.ti {
+  display: flex;
+  justify-content: space-between;/* Align items vertically in the center if needed */
 }
+
 </style>

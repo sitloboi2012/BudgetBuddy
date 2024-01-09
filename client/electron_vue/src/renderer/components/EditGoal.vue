@@ -51,7 +51,7 @@ import { ref, defineEmits, onMounted, toRefs } from 'vue';
 import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
 import axios from 'axios';
 
-const user_id = '6593ccdf025b256e0ffe24e8';
+const user_id = localStorage.getItem('userId') ?? '';
 let { data } = defineProps(['data']);
 let { connected_account_name, current_balance, goal_created_date, goal_end_date, goal_name, id, saving_amount } = toRefs(data);
 let goalname = ref(goal_name.value);
@@ -95,7 +95,7 @@ async function addGoal() {
     });
 
     console.log('Server response:', response.data);
-    closeModal();
+
 
     // Handle success or update UI accordingly
   } catch (error) {

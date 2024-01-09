@@ -5,6 +5,7 @@
     import Form from '../components/Form.vue'
     import EditAcc from '../components/EditAcc.vue'
     import EditPro from '../components/EditProfile.vue'
+    import Links from  '../components/Link.vue';
 
     const isFormVisible = ref(false);
     const isFormVisible2 = ref(false);
@@ -40,6 +41,7 @@
 </script>
 
 <template>
+    <Links/>
     <EditAcc class="form" v-if="isFormVisible2" @close-modal="closeForm2" :data="newdata"/>
     <EditPro class="form" v-if="isFormVisible3" @close-modal="closeForm3" :data="newdata"/>
     <Form class="form" v-if="isFormVisible" @close-modal="closeForm" />

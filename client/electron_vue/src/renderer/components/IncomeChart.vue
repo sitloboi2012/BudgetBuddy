@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script>
+<script >
 import VueApexCharts from 'vue3-apexcharts';
 import axios from 'axios';
 
@@ -56,7 +56,6 @@ export default {
     
         this.chartOptions.xaxis.categories = categories;
         this.series[0].data = incomeData;
-        this.series[1].data = outcomeData;
       } catch (error) {
         console.error('Error fetching transaction data:', error);
       }
