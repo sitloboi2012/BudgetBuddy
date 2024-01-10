@@ -16,6 +16,16 @@ import { ref, onMounted, watch , watchEffect} from 'vue';
 import axios from 'axios';
 
 import { computed } from 'vue';
+
+import Form from './Form.vue'
+
+
+const isFormVisible = ref(false);
+
+const closeForm = () => {
+  isFormVisible.value = false;
+};
+
 const investmentData = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 3; // Adjust the number of items per page as needed
@@ -64,10 +74,11 @@ watchEffect((cleanupFn) => {
 
 
 <template>
+    <Form class="form" v-if="isFormVisible" @close-modal="closeForm" />
      <header class="  h-16 border-t ps-5  flex items-center w-full ">
     
     <h1 class="font-semibold text-lg w-full flex items-center "><span class="w-max">Investment Balance</span>
-        <Button class="w-6 h-6 p-0 ms-4 bg-indigo-700 align-middle">
+        <Button class="w-6 h-6 p-0 ms-4 bg-indigo-700 align-middle" @click="isFormVisible = true">
          +
           </Button>
     </h1>
