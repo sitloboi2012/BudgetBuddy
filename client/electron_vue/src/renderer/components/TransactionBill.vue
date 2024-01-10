@@ -80,8 +80,8 @@ onMounted(async () => {
   <div>
     <h1 class="font-semibold text-lg text-left ps-5 pb-5">Upcoming Bills</h1>
    
-    <div class="  justify-center gap-4 h-44 carousel rounded-box w-full">
-    <div class="carousel-item w-full bg-indigo-700">
+    <div class="  justify-center gap-4 h-44 carousel rounded-box w-full ">
+    <div class="carousel-item  bg-indigo-700">
         <!-- Use v-for to loop through a range (0 to 3) and create a card for each iteration -->
       <Card
         v-for="(bill, index) in billData"

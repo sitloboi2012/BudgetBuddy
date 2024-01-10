@@ -299,7 +299,7 @@ onMounted(fetchForecastData);
 
 <template>
    
-  <section class="display">
+  <section class="h-full">
 
     <div class="grid grid-cols-5 gap-4 h-full">
         
@@ -345,8 +345,8 @@ onMounted(fetchForecastData);
   </Select>
   <div class="desc w-full text-left pt-4 "><p class="text-black text-xl font-semibold"><span class="text-indigo-800">{{ selectedMonthName }}</span> cost against budget</p></div>
     </div>
-        <div class="bg-white text-sm text-gray-950 leading-none border-2 border-gray-200 rounded-full inline-flex mt-4 w-full  ">
-    <button @click="toggleButton('budget')" :class="{ 'active': activeButton === 'budget' }" class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:text-indigo-800 focus:text-indigo-800 rounded-l-full px-4 py-2 w-1/2" id="grid">
+        <div class="bg-white text-sm text-gray-950 leading-none border-2 border-gray-200 rounded-full inline-flex mt-4 w-full  focus:text-white">
+    <button @click="toggleButton('budget')" :class="{ 'active': activeButton === 'budget' }" class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:bold-lg  rounded-l-full px-4 py-2 w-1/2" id="grid">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fill-current w-4 h-4 mr-2">
         <rect x="3" y="3" width="7" height="7"></rect>
         <rect x="14" y="3" width="7" height="7"></rect>
@@ -400,7 +400,7 @@ onMounted(fetchForecastData);
   </div>
   
 </div>
-<div class="transaction h-96">
+<div class="transaction h-96 pb-10">
     <div class="h-full">
     <header class="h-16 border-t ps-5 flex items-center w-full">
       <h1 class="font-semibold text-lg w-full flex items-center h-max">
@@ -413,8 +413,8 @@ onMounted(fetchForecastData);
       </h1>
     </header>
     <div class="relative flex flex-col h-full min-w-0 w-full mb-6 break-words bg-white border-0 shadow-md dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border overflow-x-scroll">
-      <div class="p-6 px-4 pb-0 mb-0 border-b-0 rounded-t-2x"></div>
-      <div class="flex-auto px-4 pb-4 overflow-y-scroll ">
+    
+      <div class="flex-auto px-4 pb-4 overflow-y-scroll h-full">
         <ul class="flex flex-col pl-0 mb-0 rounded-lg">
           <li
             v-for="(transaction, index) in transactions"

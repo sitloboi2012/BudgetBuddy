@@ -4,7 +4,7 @@ import TransactionHistory from './TransactionHistory.vue';
 </script>
 <template>
 
-<section class="display">
+<section class="">
 
 <div class="bill pt-8 px-5">
     <TransactionBill/>

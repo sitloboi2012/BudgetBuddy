@@ -1,9 +1,11 @@
 <template>
     <div class="store">
       <div class="profile1">
-        <img src="../assets/img2.png" alt="">
+        <div class="flex justify-center items-center">    <img  src="../assets/img2.png" alt=""></div>
+    
         <h1 class="pt-4 pb-4 text-l font-bold">{{ profile.username }}</h1>
-        <button @click="editProfile([profile.password, profile.number, profile.address])">Edit</button>
+        <button class=" bg-emerald-600 cursor-pointer" @click="editProfile([profile.password, profile.number, profile.address])">Edit</button>
+        <button class="mt-4 bg-violet-600 cursor-pointer" @click="logout()">Logout</button>
       </div>
       <div class="profile2">
         <div class="info name">
@@ -42,6 +44,18 @@ const profile = ref({
   email: '',
 });
 let editData = ref(null)
+const logout = () => {
+  const confirmAction = confirm('Are you sure you want to log out?');
+  if (!confirmAction) return;
+  else {
+    localStorage.removeItem('userId');
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  window.location.href = '/';
+  }
+
+  
+};
 
 const fetchProfile = async () => {
   try {
@@ -118,7 +132,7 @@ onMounted(() => {
             height: 50px;
         }
     button{
-            background-color: #4caf50;
+           
             color: white;
             border: none;
             border-radius: 5px;

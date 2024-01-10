@@ -75,7 +75,7 @@ watchEffect((cleanupFn) => {
 
 <template>
     <Form class="form" v-if="isFormVisible" @close-modal="closeForm" />
-     <header class="  h-16 border-t ps-5  flex items-center w-full ">
+     <header class="  h-16  ps-5  flex items-center w-full ">
     
     <h1 class="font-semibold text-lg w-full flex items-center "><span class="w-max">Investment Balance</span>
         <Button class="w-6 h-6 p-0 ms-4 bg-indigo-700 align-middle" @click="isFormVisible = true">
@@ -86,7 +86,7 @@ watchEffect((cleanupFn) => {
 
   </header>
     <!-- component -->
-    <div class="py-3 ps-8 shadow-lg shadow-slate-200 rounded-lg">
+    <div class="py-3 ps-10  rounded-lg">
     <div v-for="account in paginate(investmentData, itemsPerPage, currentPage)" :key="account.id">
       <!-- Render each investment account -->
       <div class="flex items-center justify-between">
@@ -95,7 +95,7 @@ watchEffect((cleanupFn) => {
           {{ account.bank_name }}
         </span>
       </div>
-      <div class="w-full bg-slate-100 h-8 mb-6 mt-2 rounded-md">
+      <div class="w-full bg-indigo-100 h-8 mb-6 mt-2 rounded-md">
         <div class="bg-indigo-700 h-8 rounded" :style="{ width: `${(account.current_balance / totalCurrentBalance) * 100}%` }"></div>
       </div>
     </div>
@@ -118,7 +118,7 @@ watchEffect((cleanupFn) => {
         class="flex items-center justify-center"
 
       >
-        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+        <PaginationList v-slot="{ items }" class="flex items-center gap-1 pt-8">
           <PaginationFirst  @click="currentPage=1" class="w-6 h-6 bg-transparent" />
           <PaginationPrev @click="currentPage-=1" class="w-6 h-6 bg-transparent" />
 

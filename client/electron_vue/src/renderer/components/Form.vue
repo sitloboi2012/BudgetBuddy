@@ -126,6 +126,7 @@ async function createAccount() {
 
     console.log('Server response:', response.data);
     closeModal();
+    location.reload()
 
     // Handle success or update UI accordingly
   } catch (error) {

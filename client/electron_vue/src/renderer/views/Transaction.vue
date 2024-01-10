@@ -24,7 +24,7 @@ const closeForm = () => {
    <Form class="form" v-if="isFormVisible" @close-modal="closeForm" />
   <section class="display grid-cols-4">
     <div class=""><Networth @add-account="receiveEmit"/></div>
-    <div class="investment rounded-lg bg-gray-200 w-full col-span-3 mt-14">
+    <div class="screen">
    
       <div> <TransactionComponent/></div>
     </div>

@@ -17,14 +17,14 @@ const userName = ref<string | null>(null);
 
 <template>
    
-  <section class="display">
+  <section >
    
     <div class="grid grid-cols-2 gap-4 pt-5">
-  <div class="">
+  <div class="pt-8">
    <InvestmentBalance/>
   </div>
-  <div class=" pe-5"><StockMarket/></div>
-  <div class="col-span-2 news w-full overflow-x-hidden px-5">
+  <div class="pt-8 pe-5"><StockMarket/></div>
+  <div class="col-span-2 news w-full overflow-x-hidden px-5 pt-10">
    <News/>
   </div>
 
