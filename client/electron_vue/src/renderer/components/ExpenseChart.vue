@@ -8,6 +8,8 @@
 import VueApexCharts from 'vue3-apexcharts';
 import axios from 'axios';
 
+const user_id = localStorage.getItem('userId') ?? '';
+
 export default {
   name: 'Chart',
   components: {
@@ -42,7 +44,7 @@ export default {
   methods: {
     async fetchTransactionData() {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/transaction/6593ccdf025b256e0ffe24e8');
+        const response = await axios.get(`http://localhost:8080/api/v1/transaction/${user_id}`);
         const transactions = response.data;
 
         const currentYear = new Date().getFullYear();

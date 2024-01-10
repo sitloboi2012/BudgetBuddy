@@ -5,7 +5,7 @@
     <p class="amount">{{ initial - current_amount }} left</p>
     <p class="another">{{ current_amount }} spent</p>
     <fwb-progress
-                  :progress="50"
+                  :progress="roundedProgress(current_amount,initial)"
                   label-position="inside"
                   label-progress
                   size="xl"
@@ -53,59 +53,68 @@ const clickBack = () => {
 }
 const emits = defineEmits(['go-back']);
 
+const roundedProgress = (currentTotalUse, initialAmount) => {
+  return Math.ceil((currentTotalUse / initialAmount) * 100 +1);
+};
+
 </script>
 <style scoped>
     .return{
         position:fixed;
         margin-left: 30px;
-        margin-top: 10px;
+        margin-top: 9px;
         font-weight: 600;
-        font-size: 24px;
+        font-size: 20px;
         cursor: pointer;
-        color:rgba(161, 130, 255, 0.888);
+        color:rgba(0, 0, 0, 0.888);
     }
     .title{
         position:fixed;
-        margin-left: 90px;
+        margin-left: 50px;
         margin-top: 14px;
         font-weight: 600;
-        font-size: 24px;
-        color:rgba(161, 130, 255, 0.888);
+        font-size: 20px;
+        color:rgba(59, 59, 247, 0.888);
     }
     .thismonth{
-        font-size: 20px;
+        font-size: 14px;
         position:fixed;
-        margin-left: 90px;
-        margin-top: 64px;
+        margin-left: 55px;
+        margin-top: 60px;
+        font-weight: 600;
     }
     .amount{
         position:relative; 
         margin-top: 110px;
         font-size: 24px;
-        color: rgba(161, 130, 255, 0.888)
+        color: rgba(59, 59, 247, 0.888);
+        font-weight: 600;
     }
     .another{
         padding-top: 20px;
         position:relative;
-        margin-right: 310px;
+        margin-right: 330px;
         font-size: 14px;
-        color: rgba(179, 179, 179, 0.721)
+        color: rgb(171, 170, 170)
     }
     .chart{
         margin-left: 80px;
-        border: 1px solid #ddd;
+        border: 1px solid #ffffff;
         width:370px;
+        border-radius: 20px;
         background-color: white;
     }
     .aanother{
         margin-right: 37px;
         font-size: 14px;
         font-size: 14px;
-        color: rgba(179, 179, 179, 0.721)
+        color: rgb(171, 170, 170)
     }
     .trans{
         padding: 90px 0px 30px 0px;
-        margin-right: 260px;
+        font-weight: 600;
+        font-size: 17px;
+        color:rgba(59, 59, 247, 0.888);
     }
     .fwb-table {
         width: 100%; 

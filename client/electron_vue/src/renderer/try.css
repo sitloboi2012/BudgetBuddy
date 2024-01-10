@@ -116,6 +116,7 @@ top: 60px;
   overflow: hidden;
   overflow-y: auto;
 }
+
 @media screen and (min-width: 1400px){
   .screen{
     width: 70%;

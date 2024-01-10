@@ -2,7 +2,7 @@
     <Links/>
     <AddIncome class="form" v-if="isVisible2" @close-modal="closeForm2" :newmonth="newmonth"/>
     <AddSub class="form" v-if="isVisible3" @close-modal="closeForm3" :newmonth="newmonth"/>
-    <AddPlan class="form" v-if="isVisible4" @close-modal="closeForm4"/>
+    <AddPlan class="form" v-if="isVisible4" @close-modal="closeForm4" :newmonth="newmonth"/>
     <AddGoal class="form" v-if="isVisible5" @close-modal="closeForm5"/>
     <AddBill class="form" v-if="isVisible8" @close-modal="closeForm8"/>
     <EditIncome class="form" v-if="isVisible6" @close-modal="closeForm6" :data="newdata"/>
@@ -31,7 +31,7 @@
       <div class="screen">
         <!-- <Test v-if="selectedComponent === 'incomeAfterBill'" @edit="collect($event)"/> -->
         <IncomeafterBill v-if="selectedComponent === 'incomeAfterBill'" @add-income="receiveEmit2($event)" @add-sub="receiveEmit3($event)" @add-bill="receiveEmit8" @edit-income="collect1($event)" @edit-sub="collect2($event)" @edit-bill="collect3($event)" />
-        <Plan2 v-else-if="selectedComponent === 'plannedSpending'" @add-plan="receiveEmit4"  @view-plan="handleView($event)"/>
+        <Plan2 v-else-if="selectedComponent === 'plannedSpending'" @add-plan="receiveEmit4($event)"  @view-plan="handleView($event)"/>
         <SavingGoals v-else-if="selectedComponent === 'savingGoal'" @add-goal="receiveEmit5" @edit-goal="collect4($event)"/>
         <SpecificPlan v-else-if="selectedComponent === 'viewSpecificPlan'" :data="newdata" @go-back="showComponent('plannedSpending')"/>
       </div>
@@ -107,7 +107,9 @@
     console.log("seemonthinsub", newmonth)
     isVisible3.value = true;
   }
-  const receiveEmit4 = () => {
+  const receiveEmit4 = (event) => {
+    newmonth = event
+    console.log("seemonthinplan", newmonth)
     isVisible4.value = true;
   }
   const receiveEmit5 = () => {

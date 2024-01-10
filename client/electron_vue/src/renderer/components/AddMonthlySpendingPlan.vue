@@ -20,12 +20,6 @@
               label="Amount"
               class="p-2"
             />
-            <fwb-input
-              v-model="time"
-              placeholder="Jan 2024"
-              label="Time"
-              class="p-2"
-            />
             <div class="flex justify-between p-2">
               <fwb-button @click="closeModal" color="alternative">
                 Cancel
@@ -47,6 +41,8 @@
   
   const user_id = localStorage.getItem('userId') ?? '';
   const category = ref('');
+  let { newmonth } = defineProps(['newmonth']);
+  const time = ref(newmonth);
   const available = [
   { value: 'Housing', name: 'Housing' },
   { value: 'Transportation', name: 'Transportation' },
@@ -56,9 +52,8 @@
   { value: 'Health & Fitness', name: 'Health & Fitness' },
   { value: 'Debt & Loans', name: 'Debt & Loans' },
   { value: 'Education', name: 'Education' },
-]
+] 
   const initialamount = ref('');
-  const time = ref('');
   
   const isDisplay = ref(true);
   const emits = defineEmits(['close-modal']);
@@ -76,6 +71,7 @@
     const requestData = {
       category: category.value,
       initial_amount: initialAmount,
+      time_duration: time.value,
     };
   
     // Log the data before making the request
