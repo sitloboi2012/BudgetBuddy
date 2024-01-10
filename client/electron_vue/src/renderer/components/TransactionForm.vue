@@ -24,7 +24,7 @@ const fetchBankAccount = async () => {
     userAccounts.value = response.data
     console.log(userAccounts.value)
   } catch (error) {
-    console.error('Error fetching account information:', error);
+    console.error('Error fetching account information:', error.message);
   }
 };
 
@@ -44,7 +44,7 @@ const sendTransactionData = async () => {
     formData.append('transaction_date', transactionDate.value);
     formData.append('Amount', amount.value);
     formData.append('account_name', selectedAccount.value);
-    formData.append('account_type', 'Investment');
+    formData.append('account_type', accountType.value);
     formData.append('transaction_type', transactionType.value);
     formData.append('category', category.value);
     console.log(transactionName.value, transactionType.value, payee.value, amount.value, selectedAccount.value, accountType.value,  category.value, transactionDate.value);
@@ -58,6 +58,7 @@ const sendTransactionData = async () => {
 
     console.log(response.data)
     alert('Transaction created successfully!')
+    location.reload();
     // Handle success or provide user feedback
   } catch (error) {
     console.error('Error creating transaction:', error);
