@@ -15,6 +15,8 @@ const accountType = ref('Investment');
 const transactionType = ref('Income');
 const category = ref('');
 
+
+
 const fetchBankAccount = async () => {
   try {
     console.log(accountType.value)
@@ -45,7 +47,7 @@ const sendTransactionData = async () => {
     formData.append('account_type', 'Investment');
     formData.append('transaction_type', transactionType.value);
     formData.append('category', category.value);
-    console.log(transactionName.value, transactionType.value, payee.value, amount.value, selectedAccount.value, accountType.value,  category.value);
+    console.log(transactionName.value, transactionType.value, payee.value, amount.value, selectedAccount.value, accountType.value,  category.value, transactionDate.value);
 
     const response = await axios.post(`http://localhost:8080/api/v1/transaction/${user_id}/create`, formData, {
       withCredentials: true,
@@ -72,7 +74,7 @@ const sendTransactionData = async () => {
         Account Type
       </label>
       <div class="flex  justify-between">
-        <div class="pe-8"><input type="radio" id="Income" name="accountType" value="Investment" checked  v-model="accountType">
+        <div class="pe-8"><input type="radio" id="Income" name="accountType" value="Investment" checked   v-model="accountType">
 <label class="ps-4" for="html">Investment</label><br></div>
         <div class=""><input type="radio" id="Outcome" name="accountType" value="Saving"  v-model="accountType">
 <label  class="ps-4" for="Outcome">Saving</label><br></div>
@@ -84,39 +86,39 @@ const sendTransactionData = async () => {
       <label class="block text-gray-700 text-sm font-bold mb-2" for="account">
         Account
       </label>
-      <select v-model="selectedAccount" class="shadow appearance-none rounded-lg w-40 py-2 px-3 text-white mb-3 leading-tight focus:outline-none focus:shadow-outline">
+      <select v-model="selectedAccount" class="shadow appearance-none rounded-lg w-40 py-2 px-3 text-black mb-3 leading-tight focus:outline-none focus:shadow-outline">
         <option v-for="account in userAccounts" :key="account" :value="account.account_name">{{ account.account_name }}</option>
       </select> </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="data">
         Date
       </label>
-      <input required class=" shadow appearance-none  rounded-lg  w-40 py-2 px-3 text-white mb-3 leading-tight focus:outline-none focus:shadow-outline"  type="date" v-model="transactionDate">
+      <input required class=" shadow appearance-none  rounded-lg  w-40 py-2 px-3 text-black mb-3 leading-tight focus:outline-none focus:shadow-outline"  type="date" v-model="transactionDate">
      
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="payee">
         Payee
       </label>
-      <input v-model="payee" required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline" id="payee" type="text" placeholder="Payee">
+      <input v-model="payee" required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" id="payee" type="text" placeholder="Payee">
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="categories">
         Categories
       </label>
-      <input required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3  text-white leading-tight focus:outline-none focus:shadow-outline" id="category" type="text" placeholder="Category"  v-model="category">
+      <input required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3  text-black leading-tight focus:outline-none focus:shadow-outline" id="category" type="text" placeholder="Category"  v-model="category">
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="transactionName">
         Transaction Name
       </label>
-      <input required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline" id="acount" type="text"  v-model="transactionName" placeholder="Name">
+      <input required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" id="acount" type="text"  v-model="transactionName" placeholder="Name">
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">
         Amount
       </label>
-      <input  v-model="amount" required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3  text-white leading-tight focus:outline-none focus:shadow-outline" id="acount" type="text" placeholder="Amount">
+      <input  v-model="amount" required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3  text-black leading-tight focus:outline-none focus:shadow-outline" id="acount" type="text" placeholder="Amount">
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">
@@ -133,7 +135,7 @@ const sendTransactionData = async () => {
 
    
     <div class="flex items-center justify-between w-full">
-      <button class="w-1/2 bg-indigo-700 hover:bg-indigo-950 text-white font-bold py-2 px-4  rounded-lg  focus:outline-none focus:shadow-outline" type="submit">
+      <button class="w-1/2 bg-indigo-700 hover:bg-indigo-950 text-black font-bold py-2 px-4  rounded-lg  focus:outline-none focus:shadow-outline" type="submit">
        Create Transaction
       </button>
     </div>
