@@ -15,6 +15,17 @@ const accountType = ref('Investment');
 const transactionType = ref('Income');
 const category = ref('');
 
+const defaultCategory = [
+  'Housing',
+  'Transportation',
+  'Groceries',
+  'Entertainment',
+  'Food & Dining',
+  'Health & Fitness',
+  'Debt & Loans',
+  'Education'
+];
+
 
 
 const fetchBankAccount = async () => {
@@ -107,7 +118,9 @@ const sendTransactionData = async () => {
       <label class="block text-gray-700 text-sm font-bold mb-2" for="categories">
         Categories
       </label>
-      <input required class="shadow appearance-none border  rounded-lg  w-40 py-2 px-3  text-black leading-tight focus:outline-none focus:shadow-outline" id="category" type="text" placeholder="Category"  v-model="category">
+      <select v-model="category" class="shadow appearance-none rounded-lg w-40 py-2 px-3 text-black mb-3 leading-tight focus:outline-none focus:shadow-outline">
+        <option v-for="category in defaultCategory" :key="category" :value="category">{{ category }}</option>
+      </select>
     </div>
     <div class="mb-4">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="transactionName">
