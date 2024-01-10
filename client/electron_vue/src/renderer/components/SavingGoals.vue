@@ -38,7 +38,7 @@
     import { FwbProgress } from 'flowbite-vue'
     import axios from 'axios';
     
-    const user_id = '6593ccdf025b256e0ffe24e8';
+    const user_id = localStorage.getItem('userId') ?? '';
     const allGoals = ref([])
     let editData = ref(null)
     let deleteId = ref(null)
