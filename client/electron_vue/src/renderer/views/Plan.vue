@@ -16,7 +16,7 @@
           <p class='label'>Planning for</p>
         </div>
         <div class="overview-section bg-violet-600" @click="showComponent('incomeAfterBill')" >
-          <h2 class="text-xl text-white font-bold">{{ income }}</h2>
+          <h2 class="text-xl text-white font-bold">{{ inc - bil - sub }}</h2>
           <p class="text-xs text-white">Income after bill</p>
         </div>
         <div class="overview-section bg-neutral-100" @click="showComponent('plannedSpending')">
@@ -30,16 +30,16 @@
       </div>
       <div class="screen">
         <!-- <Test v-if="selectedComponent === 'incomeAfterBill'" @edit="collect($event)"/> -->
-        <IncomeafterBill v-if="selectedComponent === 'incomeAfterBill'" @add-income="receiveEmit2($event)" @add-sub="receiveEmit3($event)" @add-bill="receiveEmit8" @edit-income="collect1($event)" @edit-sub="collect2($event)" @edit-bill="collect3($event)" />
-        <Plan2 v-else-if="selectedComponent === 'plannedSpending'" @add-plan="receiveEmit4($event)"  @view-plan="handleView($event)"/>
-        <SavingGoals v-else-if="selectedComponent === 'savingGoal'" @add-goal="receiveEmit5" @edit-goal="collect4($event)"/>
+        <IncomeafterBill v-if="selectedComponent === 'incomeAfterBill'" @add-income="receiveEmit2($event)" @add-sub="receiveEmit3($event)" @add-bill="receiveEmit8" @edit-income="collect1($event)" @edit-sub="collect2($event)" @edit-bill="collect3($event)" @send-sub="rec2($event)" @send-bil="rec3($event)" @send-in="rec1($event)" />
+        <Plan2 v-else-if="selectedComponent === 'plannedSpending'" @add-plan="receiveEmit4($event)"  @view-plan="handleView($event)" @send-total-1="receiveTotal1($event)"/>
+        <SavingGoals v-else-if="selectedComponent === 'savingGoal'" @add-goal="receiveEmit5" @edit-goal="collect4($event)" @send-total-goal="receiveTotal2($event)"/>
         <SpecificPlan v-else-if="selectedComponent === 'viewSpecificPlan'" :data="newdata" @go-back="showComponent('plannedSpending')"/>
       </div>
     </section> 
 </template>
 
 <script setup lang="ts">
-  import { ref, Ref } from 'vue'
+  import { ref, Ref, computed, watch } from 'vue'
   import IncomeafterBill from '../components/IncomeafterBill.vue'
   import Plan2 from '../components/PlannedSpending.vue'
   import SavingGoals from '../components/SavingGoals.vue'
@@ -54,9 +54,8 @@
   import SpecificPlan from '../components/SpecificPlan.vue'
   import EditGoal from '../components/EditGoal.vue'
   import Links from  '../components/Link.vue';
-  const income = '$8,469.00';
-  const plannedSpending = '$30.00';
-  const savingGoals = '$500.00';
+  let plannedSpending = ref(null);
+  let savingGoals = ref(null);
   let selectedComponent: Ref<string> = ref('incomeAfterBill');
 
   const isVisible2 = ref(false);
@@ -70,12 +69,27 @@
   const isVisible10 = ref(false);
   let newdata = ref(null)
   let newmonth = ref(null)
-  let newyear = ref(null)
+  let inc = ref(null)
+  let sub = ref(null)
+  let bil = ref(null)
+  let total = ref(null);
 
 
   const handleView = (event) => {
     newdata = event
     showComponent('viewSpecificPlan');
+  }
+  const rec1 = (event) => {
+    inc = event
+    console.log('see income', inc)
+  }
+  const rec3 = (event) => {
+    bil = event
+    console.log('see bil', bil)
+  }
+  const rec2 = (event) => {
+    sub = event
+    console.log('see sub', sub)
   }
   const collect1 = (event) => {
     newdata = event
@@ -117,6 +131,14 @@
   }
   const receiveEmit8 = () => {
     isVisible8.value = true;
+  }
+  const receiveTotal1 = (event) => {
+    plannedSpending = event
+    console.log("amount", plannedSpending)
+  }
+  const receiveTotal2 = (event) => {
+    savingGoals = event
+    console.log("amount", savingGoals)
   }
   const closeForm2 = () => {
     isVisible2.value = false;

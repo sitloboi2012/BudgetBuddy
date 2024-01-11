@@ -124,7 +124,10 @@ const fetchPlan = async () => {
     userSubscription.value = response.data.filter((entry: { spending_type: string; }) => entry.spending_type === 'Subscription');
     console.log('Data from the server:', userIncome.value);
     console.log('Data from the server2:', userSubscription.value);
-
+    const totalIncome = userIncome.value.reduce((sum, incom) => sum + incom.amount, 0);
+    const totalSub = userSubscription.value.reduce((sum, sub) => sum + sub.amount, 0);
+    emits("send-in", totalIncome);
+    emits("send-sub", totalSub);
   } catch (error) {
     console.error('Error fetching account information:', error);
   }
@@ -138,6 +141,8 @@ const fetchBill = async () => {
     });
     userBill.value = currentMonthBills;
     console.log('Data from the server3:', userBill.value);
+    const totalBill = userBill.value.reduce((sum, bill) => sum + bill.bill_value, 0);
+    emits("send-bil", totalBill);
   } catch (error) {
     console.error('Error fetching account information:', error);
   }
@@ -213,7 +218,7 @@ const clickEdit3 = (itemEdit: any) => {
   console.log("edit-bill:",editData)
 }
 
-const emits = defineEmits(['add-income', 'add-sub', 'add-bill','edit-income', 'edit-sub', 'edit-bill', 'send-month','send-year']);
+const emits = defineEmits(['add-income', 'add-sub', 'add-bill','edit-income', 'edit-sub', 'edit-bill', 'send-month','send-year','send-in','send-sub','send-bil']);
 
 const toggleaddIncome = (formattedMonth: any, currentYear: any) => {
   const sendMonth = `${formattedMonth} ${currentYear}`;
