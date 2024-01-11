@@ -17,7 +17,6 @@ def set_goal(
     goal_end_date: str = Form(..., description="Goal end date"),
     goal_created_date: str = Form(..., description="Goal created date"),
     goal_name: str = Form(..., description="Goal name"),
-    connected_account_id: Optional[str] = Form(None, description="Account id"),
     connected_account_name: Optional[str] = Form(None, description="Account name"),
     goal_value: float = Form(..., description="Goal value"),
 ) -> JSONResponse:
@@ -51,7 +50,7 @@ def set_goal(
             status_code=400, detail="End date must be greater than start date"
         )
 
-    if connected_account_id is None:
+    if connected_account_name is None:
         GOAL_SETTING_BASE.insert_one(
             GoalSettingBaseModel(
                 user_id=ObjectId(user_id),
@@ -64,6 +63,10 @@ def set_goal(
             ).dict()
         )
     else:
+        account = SAVING_COLLECTION.find_one({"user_id": ObjectId(user_id), "account_name": connected_account_name})
+        if account is None:
+            raise HTTPException(status_code=404, detail="Account not found")
+        connected_account_id = account["_id"]
         GOAL_SETTING_BASE.insert_one(
             GoalSettingBaseModel(
                 user_id=ObjectId(user_id),
@@ -106,7 +109,7 @@ def get_single_goal_view(
     goal_data = GoalModelView(**goal).dict()
     goal_data["connected_account_name"]= goal["connected_account_name"]
     if goal["connected_account_id"] is not None:
-            current_balance = SAVING_COLLECTION.find_one({"account_id":ObjectId(goal["connected_account_id"]),"account_name":goal["connected_account_name"]})["current_balance"]
+            current_balance = SAVING_COLLECTION.find_one({"_id":ObjectId(goal["connected_account_id"]),"account_name":goal["connected_account_name"]})["current_balance"]
             goal_data["current_balance"] = current_balance
     else:
             goal_data["current_balance"] = None
@@ -135,7 +138,7 @@ def get_all_goal_view(
         goal_data["id"] = str(goal['_id'])
         goal_data["connected_account_name"]= goal["connected_account_name"]
         if goal["connected_account_id"] is not None:
-            current_balance = SAVING_COLLECTION.find_one({"account_id":ObjectId(goal["connected_account_id"]),"account_name":goal["connected_account_name"]})["current_balance"]
+            current_balance = SAVING_COLLECTION.find_one({"_id":ObjectId(goal["connected_account_id"]),"account_name":goal["connected_account_name"]})["current_balance"]
             goal_data["current_balance"] = current_balance
         else:
             goal_data["current_balance"] = None
@@ -152,7 +155,6 @@ def update_goal(
     goal_end_date: str = Form(None, description="Goal end date"),
     goal_created_date: str = Form(None, description="Goal created date"),
     goal_name: str = Form(None, description="Goal name"),
-    connected_account_id: Optional[str] = Form(None, description="Account id"),
     connected_account_name: Optional[str] = Form(None, description="Account name"),
     goal_value: float = Form(None, description="Goal value"),
 ) -> JSONResponse:
@@ -195,10 +197,17 @@ def update_goal(
     if goal_value is not None:
         goal["saving_amount"] = goal_value
 
-    if connected_account_id is not None:
-        goal["connected_account_id"] = ObjectId(connected_account_id)
+    if connected_account_name is not None:
         goal["connected_account_name"] = connected_account_name
+        account = SAVING_COLLECTION.find_one({"user_id": ObjectId(user_id), "account_name": connected_account_name})
+        if account is None:
+            raise HTTPException(status_code=404, detail="Account not found")
+        goal["connected_account_id"] = ObjectId(str(account["_id"]))
 
+    if connected_account_name is None:
+         goal["connected_account_name"] = None
+         goal["connected_account_id"] = None
+         
     GOAL_SETTING_BASE.update_one({"_id": ObjectId(goal_id)}, {"$set": goal})
     return JSONResponse(
         status_code=200,
