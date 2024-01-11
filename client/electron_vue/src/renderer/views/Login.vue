@@ -105,6 +105,7 @@ try {
   showModal.value = true;
     responseMessage.value = 'Login successful';
    localStorage.setItem('userId', response.data.user_id);
+   localStorage.setItem('username', response.data.user_name );
    const userId=ref('');
    userId.value = localStorage.getItem('userId') ?? '';
 
