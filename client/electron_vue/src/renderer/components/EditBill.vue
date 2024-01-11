@@ -47,7 +47,7 @@
   import { FwbButton, FwbModal, FwbInput, FwbRadio } from 'flowbite-vue';
   import axios from 'axios';
   
-  const user_id = '657deedb53a90ee98e224654';
+  const user_id = localStorage.getItem('userId') ?? '';
   let { data } = defineProps(['data']);
   let { bill_id, bill_name, bill_value, recurrent_reminder, recurrent_date_value } = toRefs(data);
   let id = ref(bill_id.value);
@@ -79,7 +79,6 @@
   
     // Log the data before making the request
     console.log('Sending data to server:', requestData);
-    closeModal();
   
     // Make the HTTP request
     try {
@@ -91,6 +90,7 @@
       });
   
       console.log('Server response:', response.data);
+
   
       // Handle success or update UI accordingly
     } catch (error) {

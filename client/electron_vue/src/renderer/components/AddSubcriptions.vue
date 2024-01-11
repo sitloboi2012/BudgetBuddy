@@ -20,17 +20,11 @@
               label="Amount"
               class="p-2"
             />
-            <fwb-input
-              v-model="time"
-              placeholder="Jan 2024"
-              label="Time"
-              class="p-2"
-            />
             <div class="flex justify-between p-2">
               <fwb-button @click="closeModal" color="alternative">
                 Cancel
               </fwb-button>
-              <fwb-button @click="addSub" color="alternative">
+              <fwb-button @click="addIncome" color="alternative">
                 Add
               </fwb-button>
             </div>
@@ -41,15 +35,17 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, defineEmits, onMounted } from 'vue';
+  import { ref, defineEmits, onMounted, toRefs } from 'vue';
   import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
   import axios from 'axios';
   
-  const user_id = '657deedb53a90ee98e224654';
+  const user_id = localStorage.getItem('userId') ?? '';
   const subname = ref('');
   const amount = ref('');
-  const time = ref('');
+  let { newmonth } = defineProps(['newmonth']);
+  const time = ref(newmonth);
   const type = ref('Subscription')
+  console.log('showtimeinsub', time.value)
   
   const isDisplay = ref(true);
   const emits = defineEmits(['close-modal']);
@@ -58,10 +54,8 @@
     isDisplay.value = false;
     emits('close-modal');
   }
-  onMounted(() => {
-    addSub();
-  });
-  async function addSub() {
+  
+  async function addIncome() {
     // Convert string inputs to numbers using parseFloat
     const currentAmount = parseFloat(amount.value);
   
@@ -87,7 +81,6 @@
   
       console.log('Server response:', response.data);
       closeModal();
-  
       // Handle success or update UI accordingly
     } catch (error) {
       console.error('Error:', error.response.data);
@@ -95,6 +88,9 @@
       // Handle error or update UI accordingly
     }
   }
+  onMounted(() => {
+    addIncome();
+  });
   </script>
   
   <style scoped>

@@ -20,12 +20,6 @@
               label="Amount"
               class="p-2"
             />
-            <fwb-input
-              v-model="time"
-              placeholder="Jan 2024"
-              label="Time"
-              class="p-2"
-            />
             <div class="flex justify-between p-2">
               <fwb-button @click="closeModal" color="alternative">
                 Cancel
@@ -41,15 +35,17 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, defineEmits, onMounted } from 'vue';
+  import { ref, defineEmits, onMounted, toRefs } from 'vue';
   import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
   import axios from 'axios';
   
-  const user_id = '657deedb53a90ee98e224654';
+  const user_id = localStorage.getItem('userId') ?? '';
   const incomename = ref('');
   const amount = ref('');
-  const time = ref('');
+  let { newmonth } = defineProps(['newmonth']);
+  const time = ref(newmonth);
   const type = ref('Income')
+  console.log('showtime', time.value)
   
   const isDisplay = ref(true);
   const emits = defineEmits(['close-modal']);

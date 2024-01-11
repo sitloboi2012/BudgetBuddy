@@ -45,7 +45,7 @@
   import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
   import axios from 'axios';
   
-  const user_id = '657deedb53a90ee98e224654';
+  const user_id = localStorage.getItem('userId') ?? '';
   let { data } = defineProps(['data']);
   let { id, spending_name, amount, time_duration } = toRefs(data);
   let spending_id = ref(id.value);
@@ -92,7 +92,7 @@
       });
   
       console.log('Server response:', response.data);
-      closeModal();
+
   
       // Handle success or update UI accordingly
     } catch (error) {

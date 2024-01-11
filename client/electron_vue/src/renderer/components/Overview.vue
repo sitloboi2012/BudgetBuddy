@@ -25,7 +25,9 @@
         </div>
       </div>
     </div>
-    <div id="chart" class="expense"><ExpenseChart/></div> 
+    <div id="chart" class="expense">
+      <ExpenseChart/>
+    </div>
   </div>
 </template>
 
@@ -41,7 +43,7 @@
   const userAccounts = ref([]);
   const todos = ref([
   ]);
-  const user_id = '6593ccdf025b256e0ffe24e8';
+  const user_id = localStorage.getItem('userId') ?? '';
   const fetchBankAccount = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/api/v1/${user_id}`);

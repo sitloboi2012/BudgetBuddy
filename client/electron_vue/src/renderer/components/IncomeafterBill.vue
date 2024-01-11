@@ -1,10 +1,13 @@
 <template>
+  <button @click="prevMonth">&lt;</button>
+    <span>{{ monthNames[currentMonth] }} {{ currentYear }}</span>
+  <button @click="nextMonth">&gt;</button>
   <div class="plan-income">
     <article class="income">
       <div @click="toggleShow" class="display">
         <div class="aqq">
           <p>Income</p>
-          <p class="aqq2" v-if="isShow" @click="toggleaddIncome">+ Add income</p>
+          <p class="aqq2" v-if="isShow" @click="toggleaddIncome(formattedMonth, currentYear)">+ Add income</p>
         </div>
         <div class="gia"><p class="gia1">+{{ sumAmount(userIncome).toFixed(2) }}</p></div>
       </div>
@@ -36,7 +39,7 @@
       <div @click="toggleShow2" class="display">
         <div class="aqq">
           <p>Subscription</p>
-          <p class="aqq2" v-if="isShow2" @click="toggleaddSub">+ Add subscription</p>
+          <p class="aqq2" v-if="isShow2" @click="toggleaddSub(formattedMonth, currentYear)">+ Add subscription</p>
         </div>
         <div class="gia"><p class="gia1">-{{ sumAmount(userSubscription).toFixed(2) }}</p></div>
       </div>
@@ -51,30 +54,72 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, toRefs, watch, watchEffect } from 'vue';
+
+import { ref, onMounted, toRefs, watchEffect, watch, computed} from 'vue';
 import axios from 'axios';
 
-const user_id = '6593ccdf025b256e0ffe24e8';
+
+const  currentMonth= ref(new Date().getMonth())
+const  currentYear= ref(new Date().getFullYear())
+const  monthNames= ref([
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ])
+
+const  prevMonth =() => {
+    if (currentMonth.value === 0) {
+      currentMonth.value = 11;
+      currentYear.value -= 1;
+    } else {
+      currentMonth.value -= 1;
+    }};
+const  nextMonth =()=> {
+    if (currentMonth.value === 11) {
+      currentMonth.value = 0;
+      currentYear.value += 1;
+    } else {
+      currentMonth.value += 1;
+    }
+  };
+
+  watch (currentMonth,async(newMonth)=>{
+    console.log('newMonth', newMonth)
+    console.log('year', currentYear.value)
+    console.log('formatMonth', formattedMonth.value)
+    fetchPlan();
+    fetchBill();
+    emits('send-month', newMonth);
+    emits('send-year', currentYear.value);
+  }
+  )
+  
+
+const user_id = localStorage.getItem('userId') ?? '';
 const userIncome = ref([]);
 const userSubscription = ref([]);
 const userBill = ref([]);
 const isShow = ref(false);
 const isShow2 = ref(false);
 const isShow3 = ref(false);
-const { month, year }  = defineProps(['month', 'year']);
-let that_month = ref(month);
-let that_year = ref(year);
+let that_year = ref( "2024");
 let editData = ref(null)
-let deleteId = ref(null)
+let sendMonth = ref(null)
+let deleteId = ref(null) 
 
-watchEffect(async () => {
-  console.log('newmonth',that_month.value)
+let formattedMonth = ref(
+  computed(() => {
+    return new Date(`${that_year.value}-${currentMonth.value + 1}-10`)
+      .toLocaleString('en-US', { month: 'short' });
+  })
+);
+
+
   
-})
+
 
 const fetchPlan = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/v1/plan_spending/${user_id}/Jan 2024`);
+    const response = await axios.get(`http://localhost:8080/api/v1/plan_spending/${user_id}/${formattedMonth.value} ${currentYear.value}`);
     userIncome.value = response.data.filter((entry: { spending_type: string; }) => entry.spending_type === 'Income');
     userSubscription.value = response.data.filter((entry: { spending_type: string; }) => entry.spending_type === 'Subscription');
     console.log('Data from the server:', userIncome.value);
@@ -87,7 +132,11 @@ const fetchPlan = async () => {
 const fetchBill = async () => {
   try {
     const response = await axios.get(`http://localhost:8080/api/v1/user_bill/${user_id}`);
-    userBill.value = response.data
+    const currentMonthBills = response.data.filter((bill) => {
+      const billDate = new Date(bill.recurrent_date_value);
+      return billDate.getMonth() === currentMonth.value && billDate.getFullYear() === currentYear.value;
+    });
+    userBill.value = currentMonthBills;
     console.log('Data from the server3:', userBill.value);
   } catch (error) {
     console.error('Error fetching account information:', error);
@@ -137,6 +186,7 @@ onMounted(() => {
   fetchBill();
 });
 
+
 const clickDelete = (itemDelete: any) => {
   deleteId = itemDelete;
   Delete(deleteId);
@@ -163,18 +213,21 @@ const clickEdit3 = (itemEdit: any) => {
   console.log("edit-bill:",editData)
 }
 
-const emits = defineEmits(['add-income', 'add-sub', 'add-bill','edit-income', 'edit-sub', 'edit-bill']);
+const emits = defineEmits(['add-income', 'add-sub', 'add-bill','edit-income', 'edit-sub', 'edit-bill', 'send-month','send-year']);
 
-const toggleaddIncome = () => {
-  emits('add-income');
+const toggleaddIncome = (formattedMonth: any, currentYear: any) => {
+  const sendMonth = `${formattedMonth} ${currentYear}`;
+  emits('add-income', sendMonth);
 };
 
-const toggleaddSub = () => {
-  emits('add-sub');
+const toggleaddSub = (formattedMonth: any, currentYear: any) => {
+  const sendMonth = `${formattedMonth} ${currentYear}`;
+  emits('add-sub',sendMonth);
 };
 const toggleaddBill = () => {
   emits('add-bill');
 };
+
 </script>
 
 
@@ -188,6 +241,7 @@ const toggleaddBill = () => {
   }
   .income{
     margin-top: 30px;
+    height: fit-content;
     background-color: lavender;
     border-radius: 10px;
     padding: 10px;
@@ -209,5 +263,6 @@ const toggleaddBill = () => {
     padding: 7px;
     justify-content: space-between;
     cursor: pointer;
+    height:40px !important;
   }
 </style>

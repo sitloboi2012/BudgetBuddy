@@ -5,16 +5,13 @@
     </div>
     <div v-for="account in allAccounts" :key="account" class="container mt-8 m-4 p-1">
         <div class="flex space-between">
-            <h1 class="flex-1 font-bold">{{ account[0] }}</h1>
-            <h1 class="flex-1 font-bold" @click="clickEdit(account)">:</h1>
+            <h1 class="flex-1 acc_name">{{ account[0] }}</h1>
+            <h1 class="flex-1 font-bold edit_butt" @click="clickEdit(account)">...</h1>
         </div>
         <div class="inner-content">
             <div class="left-content">
                 <h5>{{ account[4] }}</h5>
                 <h5>{{ account[3] }}</h5>
-            </div>
-            <div class="right-content">
-                <button>:</button>
             </div>
         </div>
     </div>
@@ -24,7 +21,7 @@
     import { ref, defineEmits, onMounted, computed } from 'vue';
     import axios from 'axios';
 
-    const user_id = '6593ccdf025b256e0ffe24e8';
+    const user_id = localStorage.getItem('userId') ?? '';
     const allAccounts = ref([]);
     let editData = ref(null)
 
@@ -62,20 +59,34 @@
         justify-content: space-between;
         width: 95%;
     }
+    .acc_name{
+        text-align: left;
+        margin-left: 20px;
+        padding-top: 10px;
+        font-weight: 500;
+    }
+    .edit_butt{
+        text-align: right;
+        margin-right: 20px;
+        padding-top: 10px;
+        font-weight: 500;
+    }
     .container{
     background-color: rgb(193, 184, 236);
     border-radius: 20px;
+    width: 95%;
     }
 
     .inner-content {
-    display: flex;
-    background-color: gainsboro;
+    text-align: left;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
     justify-content: space-between;
     margin: 20px; /* Adjust the margin as needed */
     }
 
     .left-content {
-    margin-right: 20px; /* Adjust the margin as needed */
+    margin-left: 20px; /* Adjust the margin as needed */
     }
 
     .right-content {

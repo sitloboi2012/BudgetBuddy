@@ -8,9 +8,10 @@
   </div>
 </template>
 
-<script>
+<script >
 import VueApexCharts from 'vue3-apexcharts';
 import axios from 'axios';
+const user_id = localStorage.getItem('userId') ?? '';
 
 export default {
   name: 'Chart',
@@ -41,7 +42,7 @@ export default {
   methods: {
     async fetchTransactionData() {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/transaction/6593ccdf025b256e0ffe24e8');
+        const response = await axios.get(`http://localhost:8080/api/v1/transaction/${user_id}`);
         const transactions = response.data;
 
         const currentYear = new Date().getFullYear();
@@ -56,7 +57,6 @@ export default {
     
         this.chartOptions.xaxis.categories = categories;
         this.series[0].data = incomeData;
-        this.series[1].data = outcomeData;
       } catch (error) {
         console.error('Error fetching transaction data:', error);
       }

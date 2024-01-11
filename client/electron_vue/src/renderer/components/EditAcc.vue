@@ -39,7 +39,7 @@ import { ref, defineEmits, onMounted, toRefs } from 'vue';
 import { FwbButton, FwbModal, FwbInput, FwbSelect } from 'flowbite-vue';
 import axios from 'axios';
 
-const user_id = '657deedb53a90ee98e224654';
+const user_id = localStorage.getItem('userId') ?? '';
 let { data } = defineProps(['data']);
 let ac= toRefs(data);
 let youraccount = ref(ac[0])
@@ -77,7 +77,6 @@ async function editAcc() {
     });
 
     console.log('Server response:', response.data);
-    closeModal();
 
     // Handle success or update UI accordingly
   } catch (error) {
