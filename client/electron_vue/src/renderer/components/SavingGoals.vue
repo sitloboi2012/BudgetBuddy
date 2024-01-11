@@ -49,6 +49,9 @@
             const response = await axios.get(`http://localhost:8080/api/v1/goal_saving_setting/${user_id}`);
             allGoals.value = response.data;
             console.log('Monthly Expense Plans:', allGoals.value);
+            const totalGoal = allGoals.value.reduce((sum, goal) => sum + goal.saving_amount, 0);
+            console.log("Total Goal:", totalGoal);
+            emits('send-total-goal',totalGoal)
         } catch (error) {
             console.error('Error fetching monthly expense plans:', error);
         }
@@ -77,7 +80,7 @@
         Delete(deleteId);
         };
 
-        const emits = defineEmits(['add-goal','edit-goal']);
+        const emits = defineEmits(['add-goal','edit-goal', 'send-total-goal']);
 
         const addGoal = () => {
         emits('add-goal');

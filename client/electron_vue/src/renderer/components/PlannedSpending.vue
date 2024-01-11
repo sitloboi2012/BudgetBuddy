@@ -87,6 +87,9 @@ const fetchMonthlyExpensePlans = async () => {
     });
     monthlyExpensePlans.value = planInMonth;
     console.log('Monthly Expense Plans:', monthlyExpensePlans.value);
+    const totalInitialAmount = monthlyExpensePlans.value.reduce((sum, expense) => sum + expense.initial_amount, 0);
+    console.log("Total Initial Amount:", totalInitialAmount);
+    emits('send-total-1',totalInitialAmount)
   } catch (error) {
     console.error('Error fetching monthly expense plans:', error);
   }
@@ -113,7 +116,7 @@ const clickDelete = (itemDelete: any) => {
   deleteId = itemDelete;
   Delete(deleteId);
 };
-const emits = defineEmits(['add-plan', 'view-plan', 'send-month1', 'send-year1']);
+const emits = defineEmits(['add-plan', 'view-plan', 'send-month1', 'send-year1', 'send-total-1']);
 
 const addPlan = (formattedMonth: any, currentYear: any) => {
   const sendMonth = `${formattedMonth} ${currentYear}`;
