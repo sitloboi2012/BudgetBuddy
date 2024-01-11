@@ -1,4 +1,5 @@
 from __future__ import annotations
+from functools import lru_cache
 
 import yfinance as yf
 
@@ -12,6 +13,7 @@ router = APIRouter(prefix="/api/v1", tags=["Investment Page"])
 
 STOCK_LIST = ["aapl", "msft", "tsla", "metv", "goog", "amzn", "nflx"]
 
+@lru_cache()
 @router.get("/get_all_stocks", response_model=ListOfStocks)
 def get_stocks():
     stock_list = []
@@ -30,6 +32,7 @@ def get_stocks():
     
     return ListOfStocks(list_of_stocks=stock_list)
 
+@lru_cache()
 @router.get("/get_invested_account_data/{user_id}", response_model=GetInvestedAccountData)
 def get_invested_account_data(user_id: str):
     account_data = INVESTMENT_COLLECTION.find({"user_id": ObjectId(user_id)})

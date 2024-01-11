@@ -12,6 +12,7 @@ router = APIRouter(prefix="/api/v1", tags=["News Feed"])
 STOCK_LIST = ["aapl", "msft", "tsla"]
 
 
+
 def flatten(nested_list):
     """
     Flatten a nested list into a single list.
@@ -68,6 +69,7 @@ def create_news_objects(ticker_news: list[dict]) -> list[News]:
         for news in ticker_news
     ]
 
+@lru_cache()
 def get_news_yahoo() -> list[list[News]]:
     """
     Returns a list of lists of News objects for each ticker in the global list of stock tickers.
