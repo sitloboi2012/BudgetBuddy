@@ -190,12 +190,12 @@ def bank_account_import(user_id: str, csv_file: UploadFile = File(...)):
     return JSONResponse( content= data)
 
 @router.get(
-    "/bank_account/{user_id}/{account_type}/{account_name}", response_model=GetAccountInformation
+    "/bank_account/{user_id}/{account_type}/{id}", response_model=GetAccountInformation
 )
 def get_bank_account_info(
     user_id: str,
     account_type: str,
-    account_name: str,
+    id: str,
 ):
     """
     Retrieve information about a bank account.
@@ -203,7 +203,7 @@ def get_bank_account_info(
     Args:
         user_id (str): The ID of the user.
         account_type (str): The type of the account.
-        account_name (str): The name of the account.
+        id (str): ID of the account.
 
     Returns:
         GetAccountInformation: The account information.
@@ -213,12 +213,13 @@ def get_bank_account_info(
     """
     account_type_model = MODEL[account_type]
     account_data = account_type_model[1].find_one(
-        {"account_name": account_name, "user_id": ObjectId(user_id)}
+        {"_id": ObjectId(id), "user_id": ObjectId(user_id)}
     )
 
     bank_name = BANK_COLLECTION.find_one({"_id": account_data["bank_id"]})["bank_name"]
 
     return GetAccountInformation(
+        id= str(account_data["_id"]),
         account_name=account_data["account_name"],
         account_type=account_type,
         bank_name=bank_name,
@@ -249,7 +250,7 @@ def get_all_account_data(user_id: str):
                     for data in list_data:
                         bank_name = BANK_COLLECTION.find_one({"_id": ObjectId(data["bank_id"])})["bank_name"]
                         result.append([data["account_name"], data["current_balance"], 
-                                       str(ObjectId(data["account_id"])),bank_name, key])
+                                       str(ObjectId(data["account_id"])),bank_name, key, str(data["_id"])])
 
     return GetAllAccountName(list_account_name=result)
 
@@ -268,14 +269,14 @@ def get_all_account_type(
     result = []
     for account in list_account:
         bank_name = BANK_COLLECTION.find_one({"_id": account["bank_id"]})["bank_name"]
-        account_data = GetAccountInformation(**account, bank_name= bank_name).dict()
+        account_data = GetAccountInformation(**account, bank_name= bank_name, id= str(account["_id"]) ).dict()
         account_data["id"] = str(account["_id"])
         result.append(account_data) 
     return JSONResponse(status_code=200,content= result)
 
-@router.put("/{user_id}/{account_type}/{account_name}")
+@router.put("/{user_id}/{account_type}/{id}")
 def update_account_info(
-    user_id: str, account_type: str, account_name: str, 
+    user_id: str, account_type: str, id: str, 
     new_account_name: str = Form(None, description="Account name of the user"),
     new_bank_name:  str = Form(None, description="New bank name"),
 ):
@@ -285,36 +286,39 @@ def update_account_info(
     Args:
         user_id (str): The ID of the user.
         account_type (str): The type of the account.
-        account_name (str): The name of the account.
+        ud (str): Id of the account.
 
     Returns:
         JSONResponse: The response indicating the success of the update.
     """
     account_type_model = MODEL[account_type]
     update_data = {}
-    if new_account_name is not None:
-        update_data["account_name"]= new_account_name
-    if new_bank_name is not None:
-        bank = BANK_COLLECTION.find_one({"bank_name": new_bank_name})
-        if bank is None:
-            return JSONResponse(status_code=422, content={ "message": f"Invalid bank name"})
-        bank_id = bank["_id"]
-        update_data["bank_id"] = ObjectId(bank_id)
-    account_type_model[1].update_one(
-            {"account_name": account_name, "user_id": ObjectId(user_id)},
-            {"$set": update_data},
+    try:
+        if new_account_name is not None:
+            update_data["account_name"]= new_account_name
+        if new_bank_name is not None:
+            bank = BANK_COLLECTION.find_one({"bank_name": new_bank_name})
+            if bank is None:
+                return JSONResponse(status_code=422, content={ "message": f"Invalid bank name"})
+            bank_id = bank["_id"]
+            update_data["bank_id"] = ObjectId(bank_id)
+        account_type_model[1].update_one(
+                {"_id": ObjectId(id), "user_id": ObjectId(user_id)},
+                {"$set": update_data},
+            )
+
+        return JSONResponse(
+            status_code=200, content={"message": "Bank account updated successfully"}
         )
-
-    return JSONResponse(
-        status_code=200, content={"message": "Bank account updated successfully"}
-    )
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)})
 
 
-@router.delete("/{user_id}/{account_type}/{account_name}")
+@router.delete("/{user_id}/{account_type}/{id}")
 def delete_account(
     user_id: str,
     account_type: str,
-    account_name: str,
+    id: str,
 ):
     """
     Delete a bank account for a specific user.
@@ -322,14 +326,14 @@ def delete_account(
     Args:
         user_id (str): The ID of the user.
         account_type (str): The type of the account.
-        account_name (str): The name of the account.
+        id (str): Id of the account.
 
     Returns:
         JSONResponse: The response indicating the success of the deletion.
     """
     account_type_model = MODEL[account_type]
     account_type_model[1].delete_one(
-        {"account_name": account_name, "user_id": ObjectId(user_id)}
+        {"_id": ObjectId(id), "user_id": ObjectId(user_id)}
     )
     ACCOUNT_COLLECTION.update_one(
         {"user_id": ObjectId(user_id)}, {"$inc": {"number_of_account": -1}}

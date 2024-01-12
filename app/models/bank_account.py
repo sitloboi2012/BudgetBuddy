@@ -37,6 +37,7 @@ class ExpenseAccount(BaseAccount):
     tag_id: str = Field(None, description="Tag id of the bank account")
     
 class GetAccountInformation(BaseModel):
+    id: str = Field(None, description="Id of the bank account")
     account_name: str = Field(..., description="Account name of the bank account")
     bank_name: str = Field(..., description="Bank name of the bank account")
     current_balance: float = Field(..., description="Current balance of the bank account")
