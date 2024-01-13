@@ -25,6 +25,7 @@
             placeholder="Enter your password"
             label="Verified your password"
             class="p-2"
+            required
           />
           <fwb-input
             v-model="newpass"
