@@ -77,5 +77,9 @@ def update_profile( id:str,
             except ValueError as e:
                 return JSONResponse(status_code=422, content={"message": str(e)})
     else:
+
             return JSONResponse(status_code=404, content={"message": "User not found or password is incorrect"})
+
+          
    
+
