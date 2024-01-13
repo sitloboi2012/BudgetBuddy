@@ -20,6 +20,18 @@
             label="Phone number"
             class="p-2"
           />
+          <fwb-input
+            v-model="verify"
+            placeholder="Enter your password"
+            label="Verified your password"
+            class="p-2"
+          />
+          <fwb-input
+            v-model="newpass"
+            placeholder="Enter your phone number"
+            label="Enter new password"
+            class="p-2"
+          />
           <div class="flex justify-between p-2">
             <fwb-button @click="closeModal" color="alternative">
               Cancel
@@ -42,9 +54,10 @@ import axios from 'axios';
 const user_id = localStorage.getItem('userId') ?? '';
 let { data } = defineProps(['data']);
 let info= toRefs(data);
-let pass = ref(info[0])
 let num = ref(info[1])
 let user_address = ref(info[2])
+let verify = ref()
+let newpass = ref()
 
 
 const isShowModal = ref(true);
@@ -63,7 +76,8 @@ async function editPro() {
   // Create the request payload
   const requestData = {
     number: phone,
-    password: pass.value,
+    password_verify: verify.value,
+    new_password: newpass.value,
     address: user_address.value,
   };
   console.log('Sending data to server:', info);
@@ -72,7 +86,7 @@ async function editPro() {
 
   // Make the HTTP request
   try {
-    const response = await axios.put(`http://localhost:8080/api/v1/profile/${user_id}`, requestData, {
+    const response = await axios.put(`http://localhost:8080/api/v1/profile_update/${user_id}`, requestData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -89,7 +103,5 @@ async function editPro() {
     // Handle error or update UI accordingly
   }
 }
-  onMounted(() => {
-    editPro();
-  });
+
 </script>
