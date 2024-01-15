@@ -1,8 +1,9 @@
 <template>
-  <button @click="prevMonth">&lt;</button>
-    <span>{{ monthNames[currentMonth] }} {{ currentYear }}</span>
-  <button @click="nextMonth">&gt;</button>
-  <div class="plan-income">
+<div class="h-6"></div>
+  <button class="w-6 h-6 p-0 me-4 bg-indigo-700 align-middle text-white font-bold cursor-pointer rounded-md" @click="prevMonth">&lt;</button>
+    <span class="font-bold text-lg">{{ monthNames[currentMonth] }} {{ currentYear }}</span>
+    <button class="w-6 h-6 p-0 me-4 bg-indigo-700 align-middle text-white font-bold ms-4 cursor-pointer rounded-md" @click="nextMonth">&gt;</button>
+  <div class="plan-income mt-8">
     <article class="income">
       <div @click="toggleShow" class="display">
         <div class="aqq">
@@ -14,8 +15,9 @@
       <div v-for="incomeEntry in userIncome" class="bg-white flex justify-between rounded-lg p-1.5 m-2" v-if="isShow">
         <p class="flex-1 pb-1.5">{{ incomeEntry.spending_name }}</p>
         <p class="flex-1 pb-1.5">{{ incomeEntry.amount.toFixed(2) }}</p>
-        <button @click="clickEdit(incomeEntry)">Edit</button>
-        <button @click="clickDelete(incomeEntry.id)">Delete</button>
+        <Button class="cursor-pointer w-fit h-6 px-2 me-4 bg-indigo-700 align-middle text-white" @click="clickEdit(incomeEntry)">Edit</Button>
+        <Button class="cursor-pointer w-fit h-6 px-2 me-4 align-middle text-white bg-orange-800" @click="clickDelete(incomeEntry.id)">Delete</Button>
+        
       </div>
     </article>
     <article class="income">
@@ -31,8 +33,8 @@
         <p class="flex-1 pb-1.5">{{ billEntry.bill_name }}</p>
         <p class="flex-1 pb-1.5">{{ billEntry.bill_value.toFixed(2) }}</p>
         <p class="flex-1 pb-1.5">{{ billEntry.recurrent_reminder}}</p>
-        <button @click="clickEdit3(billEntry)">Edit</button>
-        <button @click="clickDelete2(billEntry.bill_id)">Delete</button>
+        <Button class="cursor-pointer w-fit h-6 px-2 me-4 bg-indigo-700 align-middle text-white" @click="clickEdit3(billEntry)">Edit</Button>
+        <Button class="cursor-pointer w-fit h-6 px-2 me-4 bg-orange-800 align-middle text-white" @click="clickDelete2(billEntry.bill_id)">Delete</Button>
       </div>
     </article>
     <article class="income">
@@ -46,8 +48,8 @@
       <div v-for="subEntry in userSubscription" class="bg-white flex justify-between rounded-lg p-1.5 m-2" v-if="isShow2">
         <p class="flex-1 pb-1.5">{{ subEntry.spending_name }}</p>
         <p class="flex-1 pb-1.5">{{ subEntry.amount.toFixed(2) }}</p>
-        <button @click="clickEdit2(subEntry)">Edit</button>
-        <button @click="clickDelete(subEntry.id)">Delete</button>
+        <Button class="cursor-pointer w-fit h-6 px-2 me-4 bg-indigo-700 align-middle text-white" @click="clickEdit2(subEntry)">Edit</Button>
+        <Button class="cursor-pointer w-fit h-6 p-2 me-4 bg-orange-800 align-middle text-white" @click="clickDelete(subEntry.id)">Delete</Button>
       </div>
     </article>
   </div>
@@ -55,6 +57,7 @@
 
 <script setup lang="ts">
 
+import { Button } from '../../@/components/ui/button'
 import { ref, onMounted, toRefs, watchEffect, watch, computed} from 'vue';
 import axios from 'axios';
 
@@ -242,7 +245,9 @@ const toggleaddBill = () => {
       position: absolute;
       top: 20px;
       left: 20px;
-      width: 93%;
+      width: 100%;
+     padding-left: 2rem;
+      padding-right: 4rem;
   }
   .income{
     margin-top: 30px;

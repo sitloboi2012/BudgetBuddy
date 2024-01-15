@@ -36,7 +36,7 @@ const randomColor = () => {
 };
 
 const userName = ref<string | null>(null);
-const year = ref(2023);
+const year = ref(2024);
 const selectedMonth = ref('01');
 const user_id = localStorage.getItem('userId');
 const transactions = ref([]);
