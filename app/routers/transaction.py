@@ -205,7 +205,7 @@ def delete_transaction(user_id: str, transaction_id: str):
     try:
         transaction = TRANSACTION_COLLECTION.find_one({"_id": ObjectId(transaction_id), "user_id": ObjectId(user_id)})
         Amount = -transaction["Amount"]
-        if transaction["transaction_type"] == "Income":
+        if transaction["transaction_type"] in ["Income","Investment"]:
             MODEL[transaction["account_type"]].update_one(
                 {"user_id": ObjectId(user_id), "account_name": transaction["account_name"]},
                 {"$inc": {"current_balance": Amount}}
