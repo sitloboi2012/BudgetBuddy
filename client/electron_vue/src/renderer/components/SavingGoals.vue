@@ -1,11 +1,12 @@
 <template>
     <div class="plan-income">
     <article class="plann" v-for="goal in allGoals" :key="goal">
-        <button>
-            <div class="flex space-between">
-            <h1 class="flex-1" :style="{fontSize: '20px'}">{{ goal.goal_name }}</h1>
-            <p class="flex-1" @click="clickEdit(goal)">edit</p>
-            <p class="flex-1" @click="clickDelete(goal.id)">delete</p>
+       <div class="p-4">
+            <div class="flex space-between ">
+            <h1 class="flex-1 text-lg font-bold text-left" >{{ goal.goal_name }}</h1>
+            <div>
+            <Button class="flex-1 bg-indigo-800 text-white me-4" @click="clickEdit(goal)">Edit</Button>
+            <Button class="flex-1  bg-orange-800 text-white " @click="clickDelete(goal.id)">Del</Button></div>  
             </div>
             <h2 :style="{fontSize: '12px',paddingTop:'20px', paddingBottom: '5px', color:'grey'}">${{ goal.current_balance || 0}} saved so far</h2>
             <fwb-progress
@@ -13,21 +14,21 @@
                   label-position="inside"
                   label-progress
                   size="xl"
-                  class="chart"
+                  class="chart" 
+                  color="indigo"
                 />
             <div class="details">    
                 <div class="left-column">
-                    <p>saved</p>
-                    <p>left to save</p>
+                    
                 </div>
-                <div class="right-column">
-                    <p :style="{textAlign: 'right'}">Goal: {{ goal.saving_amount }}</p>
-                    <p :style="{textAlign: 'right'}">Expected by {{ goal.goal_end_date }}</p>
+                <div class="right-column pt-2">
+                    <p class="text-sm" :style="{textAlign: 'right'}"> <strong>Goal:</strong>$ {{ goal.saving_amount }}</p>
+                    <p class="text-sm" :style="{textAlign: 'right'}"><strong>Expected by </strong><i>{{ goal.goal_end_date }}</i> </p>
                 </div>
             </div>
-        </button>
+        </div>
     </article>
-    <article class="addplan" @click="addGoal">
+    <article class="addplan cursor-pointer" @click="addGoal">
           <h1>+</h1>
     </article>
 </div>
@@ -37,6 +38,7 @@
     import { ref, defineEmits, onMounted } from 'vue';
     import { FwbProgress } from 'flowbite-vue'
     import axios from 'axios';
+    import {Button} from '../../@/components/ui/button';
     
     const user_id = localStorage.getItem('userId') ?? '';
     const allGoals = ref([])
@@ -72,12 +74,15 @@
         });
         const clickEdit = (itemEdit: any) => {
             editData = itemEdit,
+            
             emits("edit-goal", editData);
             console.log("edit-goal:",editData)
+         
         }
         const clickDelete = (itemDelete: any) => {
         deleteId = itemDelete;
         Delete(deleteId);
+        fetchGoals();
         };
 
         const emits = defineEmits(['add-goal','edit-goal', 'send-total-goal']);
@@ -118,13 +123,7 @@ margin: 7px auto;
     float: left;
     margin: 7px auto;
 }
-button {
-border: none;
-width: 100%;
-text-align: left;
-padding-left: 13px ;
-padding-top: 3px;
-}
+
 .details {
   display: flex;
   justify-content: space-between;

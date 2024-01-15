@@ -10,7 +10,7 @@
           <p>Income</p>
           <p class="aqq2" v-if="isShow" @click="toggleaddIncome(formattedMonth, currentYear)">+ Add income</p>
         </div>
-        <div class="gia"><p class="gia1">+{{ sumAmount(userIncome).toFixed(2) }}</p></div>
+        <div class="gia "><p class="gia1 font-bold text-green-700">+ ${{ sumAmount(userIncome).toFixed(2) }}</p></div>
       </div>
       <div v-for="incomeEntry in userIncome" class="bg-white flex justify-between rounded-lg p-1.5 m-2" v-if="isShow">
         <p class="flex-1 pb-1.5">{{ incomeEntry.spending_name }}</p>
@@ -26,7 +26,7 @@
           <p>Bill</p>
           <p class="aqq2" v-if="isShow3" @click="toggleaddBill">+ Add Bill</p>
         </div>
-        <div class="gia"><p class="gia1">-{{ sumBill(userBill).toFixed(2) }}</p></div>
+        <div class="gia"><p class="gia1 font-bold text-orange-700">- ${{ sumBill(userBill).toFixed(2) }}</p></div>
       </div>
       <div v-for="billEntry in userBill" class="bg-white flex justify-between rounded-lg p-1.5 m-2" v-if="isShow3">
         <p class="flex-1 pb-1.5">{{ billEntry.recurrent_date_value}}</p>
@@ -43,7 +43,7 @@
           <p>Subscription</p>
           <p class="aqq2" v-if="isShow2" @click="toggleaddSub(formattedMonth, currentYear)">+ Add subscription</p>
         </div>
-        <div class="gia"><p class="gia1">-{{ sumAmount(userSubscription).toFixed(2) }}</p></div>
+        <div class="gia"><p class="gia1 font-bold text-orange-700">- ${{ sumAmount(userSubscription).toFixed(2) }}</p></div>
       </div>
       <div v-for="subEntry in userSubscription" class="bg-white flex justify-between rounded-lg p-1.5 m-2" v-if="isShow2">
         <p class="flex-1 pb-1.5">{{ subEntry.spending_name }}</p>
