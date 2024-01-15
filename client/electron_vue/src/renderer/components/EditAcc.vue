@@ -45,6 +45,7 @@ let ac= toRefs(data);
 let youraccount = ref(ac[0])
 let balance = ref(ac[1])
 let accountbank = ref(ac[3])
+let accid = ref(ac[5])
 let selected = ref(ac[4])
 const bank = [
   { value: 'VIB', name: 'VIB' },
@@ -69,7 +70,7 @@ async function editAcc() {
   };
 
   try {
-    const response = await axios.put(`http://localhost:8080/api/v1/${user_id}/${selected.value}/${youraccount.value}`, requestData, {
+    const response = await axios.put(`http://localhost:8080/api/v1/${user_id}/${selected.value}/${accid.value}`, requestData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -85,7 +86,4 @@ async function editAcc() {
     // Handle error or update UI accordingly
   }
 }
-  onMounted(() => {
-    editAcc();
-  });
 </script>
