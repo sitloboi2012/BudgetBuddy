@@ -9,7 +9,7 @@ import axios from 'axios';
 import { columns } from "./TransactionTable/columns";
 import type { Payment } from './TransactionTable/columns';
 import DataTable from "./TransactionTable/DataTable.vue"
-import { Button } from '../../@/components/ui/Button'
+import { Button } from '../../@/components/ui/button'
 import TransactionForm from './TransactionForm.vue';
 const data = ref<Payment[]>([])
 const user_id = localStorage.getItem('userId') ?? '';

@@ -72,7 +72,7 @@ async function editPro() {
 
   // Make the HTTP request
   try {
-    const response = await axios.put(`http://localhost:8080/api/v1/profile/${user_id}`, requestData, {
+    const response = await axios.put(`http://localhost:8080/api/v1/profile/${user_id}/update`, requestData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
