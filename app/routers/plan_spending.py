@@ -18,7 +18,7 @@ def create_spending(
     spending_type: str = Form(..., description="Type of the spending. This should either be Income, Bills, Subscription or Credit Card Payment"),
     time_duration: str = Form(..., description="Time duration of the spending planning. Example: Jan 2024, Feb 2024, etc.")
 ):
-    if PLANNING_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "spending_name": spending_name}) is not None:
+    if PLANNING_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "spending_name": spending_name, "time_duration":time_duration}) is not None:
         raise HTTPException(status_code=400, detail="Spending name already exist")
     
     spending = PlannedSpendingModel(
@@ -82,7 +82,7 @@ def create_monthly_expense_plan(
     initial_amount: int | float = Form(..., description="Initial amount of the spending"),
     time_duration: str = Form(..., description="Time Duration for Expense Planning. For example: Jan 2024, Feb 2023, etc.")
 ):
-    if EXPENSE_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "category": category}) is not None:
+    if EXPENSE_SPENDING_COLLECTION.find_one({"user_id": ObjectId(user_id), "category": category ,"time_duration":time_duration}) is not None:
         raise HTTPException(status_code=400, detail="Spending name already exist")
     
     spending = MonthlyExpensePlan(

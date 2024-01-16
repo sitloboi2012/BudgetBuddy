@@ -4,7 +4,7 @@ from fastapi import APIRouter, Form, File, UploadFile
 import pandas as pd
 from io import BytesIO
 from fastapi.responses import JSONResponse
-from constant import BANK_COLLECTION, ACCOUNT_COLLECTION, SAVING_COLLECTION, INVESTMENT_COLLECTION, EXPENSE_COLLECTION
+from constant import BANK_COLLECTION, ACCOUNT_COLLECTION, SAVING_COLLECTION, INVESTMENT_COLLECTION, EXPENSE_COLLECTION, GOAL_SETTING_BASE
 from pymongo import MongoClient
 from models.bank_account import (
     SavingOrInvestmentAccount,
@@ -306,7 +306,12 @@ def update_account_info(
                 {"_id": ObjectId(id), "user_id": ObjectId(user_id)},
                 {"$set": update_data},
             )
-
+        if new_account_name is not None and account_type == "Saving":
+            if GOAL_SETTING_BASE.find_one({"user_id":ObjectId(user_id),"connected_account_id": ObjectId(id)}):
+                GOAL_SETTING_BASE.update_one(
+                    {"user_id":ObjectId(user_id),"connected_account_id": ObjectId(id)},
+                    {"$set": {"connected_account_name": new_account_name}},
+                )
         return JSONResponse(
             status_code=200, content={"message": "Bank account updated successfully"}
         )
@@ -338,6 +343,13 @@ def delete_account(
     ACCOUNT_COLLECTION.update_one(
         {"user_id": ObjectId(user_id)}, {"$inc": {"number_of_account": -1}}
     )
+    if account_type == "Saving":
+            if GOAL_SETTING_BASE.find_one({"user_id":ObjectId(user_id),"connected_account_id": ObjectId(id)}):
+                GOAL_SETTING_BASE.update_one(
+                    {"user_id":ObjectId(user_id),"connected_account_id": ObjectId(id)},
+                    {"$set": {"connected_account_name": None,
+                              "connected_account_id": None}},
+                )
     return JSONResponse(
         status_code=200, content={"message": "Bank account deleted successfully"}
     )
