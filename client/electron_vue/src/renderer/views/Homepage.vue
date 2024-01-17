@@ -19,7 +19,7 @@ const closeForm = () => {
 <template>
   <Links/>
   <Form class="form" v-if="isFormVisible" @close-modal="closeForm" />
-  <section class="display">
+  <section class="">
     <div><Networth @add-account="receiveEmit"/></div>
     <div class="screen"><OverviewVue/></div>
   </section>

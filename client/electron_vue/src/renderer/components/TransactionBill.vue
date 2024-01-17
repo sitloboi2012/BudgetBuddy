@@ -15,6 +15,7 @@ const billData = ref([]);
 const showReminderOptions = ref(false);
 const selectedBillId = ref('');
 const user_id = localStorage.getItem('userId') ?? '';
+const billDataCount = ref(0);
 
 const findBillById = (billId: string) => {
   return billData.value.find((bill) => bill.bill_id === billId);
@@ -69,6 +70,7 @@ onMounted(async () => {
   try {
     const response = await axios.get(`http://localhost:8080/api/v1/user_bill/${user_id}/sorted`);
     billData.value = response.data;
+    billDataCount.value = response.data.length;
     console.log('bill data:', billData.value);
   } catch (error) {
     console.error('Error fetching bill:', error);
@@ -81,7 +83,7 @@ onMounted(async () => {
     <h1 class="font-semibold text-lg text-left ps-5 pb-5">Upcoming Bills</h1>
    
     <div class="  justify-center gap-4 h-44 carousel rounded-box w-full ">
-    <div class="carousel-item  bg-indigo-700">
+    <div class="carousel-item  bg-indigo-700 w-full">
         <!-- Use v-for to loop through a range (0 to 3) and create a card for each iteration -->
       <Card
         v-for="(bill, index) in billData"

@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-xs w-full bg-white rounded-lg shadow dark:bg-gray-800 p-2 md:p-0">
+  <div class=" w-full bg-white rounded-lg shadow dark:bg-gray-800 p-2 md:p-0">
     <a href="#">
       <div id="chart">
-        <apexcharts width="300" height="200" type="line" :options="chartOptions" :series="series"></apexcharts>
+        <apexcharts width="550" height="200" type="line" :options="chartOptions" :series="series"></apexcharts>
       </div>
     </a>
   </div>

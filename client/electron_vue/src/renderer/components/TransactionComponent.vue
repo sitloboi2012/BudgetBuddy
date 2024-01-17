@@ -6,7 +6,7 @@ import TransactionHistory from './TransactionHistory.vue';
 
 <section class="">
 
-<div class="bill pt-8 px-5">
+<div class="bill pt-8 px-5 w-full">
     <TransactionBill/>
    
 </div>

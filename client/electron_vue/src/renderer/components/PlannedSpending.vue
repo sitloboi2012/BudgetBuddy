@@ -1,35 +1,39 @@
 <template> 
-  <button @click="prevMonth">&lt;</button>
-  <span >{{ monthNames[currentMonth] }} {{ currentYear }}</span>
-  <button  @click="nextMonth">&gt;</button>
-  <div class="plan-income">
-    <article class="plann" v-for="plan in monthlyExpensePlans" :key="plan" @click="clickView(plan)">
-          <div class='ti flex'>  
-            <h1 :style="{fontSize: '20px', paddingRight: '70px'}" class='flex-1'>{{ plan.category }}</h1>
-            <h1 :style="{fontSize: '25px', color:'blue'}" class='flex-1' @click="clickDelete(plan.id)">-</h1>
+<div class="h-6"></div>
+  <Button class="w-6 h-6 p-0 me-4 bg-indigo-700 align-middle text-white font-bold cursor-pointer rounded-md" @click="prevMonth">&lt;</Button>
+  <span class="font-bold text-lg">{{ monthNames[currentMonth] }} {{ currentYear }}</span>
+  <Button class="w-6 h-6 p-0 me-4 bg-indigo-700 align-middle text-white font-bold cursor-pointer rounded-md ms-4"  @click="nextMonth">&gt;</Button>
+  <div class="plan-income mt-10">
+    <article class="plann" v-for="plan in monthlyExpensePlans" :key="plan">
+          <div class='ti flex justify-between items-center p-4'>  
+            <h1 class='flex-1 font-bold cursor-pointer text-lg text-left'   @click="clickView(plan)">{{ plan.category }}</h1>
+            <h1  class='flex-1 cursor-pointer bg-orange-800 rounded-lg text-white w-6 h-6' @click="clickDelete(plan.id)">-</h1>
           </div>
-            <p :style="{fontSize: '13px',paddingTop:'20px', paddingBottom: '5px', color:'gray'}">{{ plan.current_total_use }} spent</p>
+            <p :style="{fontSize: '13px',paddingTop:'20px', paddingBottom: '5px', color:'gray'}">$ {{ plan.current_total_use }} spent</p>
             <fwb-progress
               :progress="roundedProgress(plan.current_total_use, plan.initial_amount)"
               label-position="inside"
               label-progress
               size="xl"
-              class="chart"
+              class="chart w-full m-0 rounded-md text-white shadow-sm "
+              color="indigo"
+            
             />
-            <p :style="{fontSize: '13px', paddingTop:'5px', paddingBottom: '20px', color:'gray'}">of {{ plan.initial_amount }}</p>
-            <h2 :style="{fontSize: '20px'}">$ {{ plan.initial_amount - plan.current_total_use }} left</h2>
+            <p :style="{fontSize: '13px', paddingTop:'5px', paddingBottom: '20px', color:'gray'}">of $ {{ plan.initial_amount }}</p>
+            <h2><strong>$ {{ plan.initial_amount - plan.current_total_use }}</strong>  left</h2>
     </article>
-    <article class="addplan" @click="addPlan(formattedMonth, currentYear)">
+    <article class="addplan cursor-pointer " @click="addPlan(formattedMonth, currentYear)">
       <h1>+</h1>
     </article>
   </div>
 
 </template>
 <script setup lang="ts">
+import { Button } from '../../@/components/ui/button'
 import { ref, defineEmits, onMounted, computed, watch } from 'vue';
 import { FwbProgress } from 'flowbite-vue'
 import axios from 'axios';
-import { faCommentsDollar } from '@fortawesome/free-solid-svg-icons';
+
 const  currentMonth= ref(new Date().getMonth())
 const  currentYear= ref(new Date().getFullYear())
 const  monthNames= ref([
@@ -79,7 +83,9 @@ let formattedMonth = ref(
 
 const fetchMonthlyExpensePlans = async () => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/v1/monthly_expense_plan/${user_id}`);
+    const response = await axios.get(`http://localhost:8080/api/v1/monthly_expense_plan/${user_id}`, {
+      withCredentials: true,
+    });
     const planInMonth = response.data.filter((plan) => {
       const planDate = `${formattedMonth.value} ${currentYear.value}`;
       console.log('showmwe',planDate)
@@ -96,7 +102,9 @@ const fetchMonthlyExpensePlans = async () => {
 };
 const Delete = async (deleteId) => {
   try {
-    const response = await axios.delete(`http://localhost:8080/api/v1/monthly_expense_plan/${user_id}/${deleteId}`);
+    const response = await axios.delete(`http://localhost:8080/api/v1/monthly_expense_plan/${user_id}/${deleteId}`, {
+      withCredentials: true,
+    });
     console.log('Delete this ID', response.data);
     await fetchMonthlyExpensePlans();
   } catch (error) {
@@ -114,15 +122,19 @@ const clickView = (itemView: any) => {
 }
 const clickDelete = (itemDelete: any) => {
   deleteId = itemDelete;
+  const confirmAction = confirm("Are you sure you want to delete this plan?") 
+  if (!confirmAction) return;
+  else
   Delete(deleteId);
 };
-const emits = defineEmits(['add-plan', 'view-plan', 'send-month1', 'send-year1', 'send-total-1']);
-
 const addPlan = (formattedMonth: any, currentYear: any) => {
   const sendMonth = `${formattedMonth} ${currentYear}`;
   console.log("viewbeforsend", sendMonth)
   emits('add-plan', sendMonth);
 };
+const emits = defineEmits(['add-plan', 'view-plan', 'send-month1', 'send-year1', 'send-total-1']);
+
+
 const roundedProgress = (currentTotalUse, initialAmount) => {
   return Math.ceil((currentTotalUse / initialAmount) * 100);
 };
@@ -158,15 +170,6 @@ const roundedProgress = (currentTotalUse, initialAmount) => {
     align-content: center;
 }
 
-.chart{
-        border: 1px solid #ddd;
-        width:90%;
-        background-color: white;
-    }
-.ti {
-  display: flex;
-  justify-content: space-between;/* Align items vertically in the center if needed */
-}
 
 
 </style>

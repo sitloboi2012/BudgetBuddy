@@ -110,10 +110,10 @@ try {
    userId.value = localStorage.getItem('userId') ?? '';
 
     console.log(userId.value);
-  router.push({ name: 'Investment' });
+  router.push({ name: 'Home' });
   console.log('Login successful:', response.data);
 
-} catch (error) {
+} catch (error: string | any) {
   if (error.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
