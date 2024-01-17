@@ -10,12 +10,12 @@
         <div v-for="accountType in uniqueAccountTypes" :key="accountType">
           <button @click="toggleAccountType(accountType)">
             <p>{{ accountType }}</p>
-            <p>{{ getSumOfAccount(accountType) }}</p>
+            <p> $  {{ getSumOfAccount(accountType) }}</p>
           </button>
           <div v-if="selectedAccountTypes.includes(accountType)">
             <div v-for="account in getAccountsByType(accountType)" :key="account[0]" class="flex justify-between">
               <p class="flex-1 pb-2.5">{{ account[0] }}</p>
-              <p class="flex-1 pb-2.5">{{ account[1] }}</p>
+              <p class="flex-1 pb-2.5">$  {{ account[1] }}</p>
             </div>
           </div>
         </div>

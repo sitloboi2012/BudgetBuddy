@@ -23,7 +23,7 @@ export default {
           width: 380,
           type: 'pie',
         },
-        labels: ['Entertainment','Work'],
+        labels: ['Entertainment','Personal','Transportation','Food & Dining','Health & Fitness'],
         responsive: [{
           breakpoint: 480,
           options: {
