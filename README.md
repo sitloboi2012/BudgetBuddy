@@ -1,7 +1,12 @@
 # BudgetBuddy
 
-BudgetBuddy is a financial management app that help you to manage your f*cking money because you are too
-dump to keep and use your money in a wise way. We promise to help you save your money. So please use us
+BudgetBuddy is a financial management app that help you manage your financial.
+We provide a desktop application that could:
+- Save transaction history
+- Save money toward goal
+- Planning a head for your month
+- Predict your future expense
+- Stock and Investment News Real-time updated
 
 ## Folder Structure
 ```
